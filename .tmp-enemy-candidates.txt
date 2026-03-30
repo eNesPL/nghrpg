@@ -1,0 +1,24 @@
+2609`tJak czytać statystyki`tNazwa:
+2634`tKomandos`t
+2658`tLitościwa siostra (szubienicznica albo słowik)`tSolo
+2691`tOficer`t
+2707`tPies bojowy`tGrupa
+2750`tuwagę na towarzyszy znaj`t
+2780`tSzeregowy żołnierz`t
+2801`tZwykły człowiek`t
+2859`t`t
+2895`t„TERAZ przestają strzelać?! Przeklęte psie syny...”`t
+2924`tGremlin okopowy`t
+2982`tczeństwa i pozbawieni ludz`t
+3008`tKultyści`tGrupa
+3057`tnią białą, jaką uda im się chwycić – czy to`t
+3107`tnocy; przyciągają`t
+3147`tSpaczenia, może na dłuższy`t
+3177`tSiewca zgnilizny`t
+3225`t`t
+3274`tw większej liczbie i być`t
+3295`tZłodziej skór`tSolo
+4165`tNowicjusz Zakonu Camlann`t
+4182`tRycerz Zakonu Camlann`t
+4204`tNimue`t
+4222`tMerlyn`t
