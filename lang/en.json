@@ -1,0 +1,683 @@
+
+{
+  "NGH": {
+    "System": {
+      "Name": "Never Going Home",
+      "Init": "Initializing Never Going Home system"
+    },
+    "Actor": {
+      "SoldierRecord": "Soldier Record",
+      "Name": "Name",
+      "Armor": "Armor",
+      "ArmorHint": "Used instead of Krzepa only when higher against physical attacks",
+      "Trained": "Trained",
+      "Rank": "Rank",
+      "GMOnly": "GM only",
+      "EmptyHand": "No cards in hand.",
+      "EmptyJourneyHand": "No cards in journey hand.",
+      "Section": {
+        "Attributes": "Attributes",
+        "Skills": "Skills",
+        "AssignedEquipment": "Assigned Equipment",
+        "ServiceRecord": "Service Record",
+        "PersonalHistory": "Personal History",
+        "Whispers": "Whisper Paths",
+        "Corruption": "Corruption",
+        "Actions": "Actions",
+        "Hand": "Hand",
+        "JourneyHand": "Journey Hand"
+      },
+      "Attribute": {
+        "Krzepa": "Krzepa",
+        "KrzepaHint": "Physical strength, agility, and bodily health",
+        "Spryt": "Spryt",
+        "SprytHint": "Intellect, knowledge, and mental health",
+        "Hart": "Hart",
+        "HartHint": "Courage, willpower, and emotional health"
+      },
+      "Skill": {
+        "Atletyka": "Atletyka",
+        "WalkaWrecz": "Walka Wręcz",
+        "Skradanie": "Skradanie się",
+        "Komunikacja": "Komunikacja",
+        "Wiedza": "Wiedza",
+        "Mechanika": "Mechanika",
+        "Sledztwo": "Śledztwo",
+        "WalkaDystansowa": "Walka Dystansowa",
+        "Transport": "Transport",
+        "Szepty": "Szepty",
+        "SzeptyHint": "Path-based occult skill"
+      },
+      "Whisper": {
+        "PathName": "Path Name",
+        "Attribute": "Governing Attribute",
+        "KnownSpells": "Known Spells",
+        "Notes": "Notes"
+      },
+      "CorruptionLabel": "Corruption Marks (0-5)",
+      "Type": {
+        "Character": "Character",
+        "NPC": "NPC"
+      }
+    },
+    "NPC": {
+      "SheetTitle": "Enemy / NPC Sheet",
+      "Name": "Name",
+      "Role": "Type",
+      "RoleSolo": "Solo",
+      "RoleGroup": "Group",
+      "Initiative": "Initiative",
+      "Armor": "Armor",
+      "Reward": "Reward",
+      "WeakSpot": "Weak spot",
+      "Weapons": "Weapons",
+      "Abilities": "Abilities",
+      "Description": "Description",
+      "Section": {
+        "Stats": "Stats",
+        "Attributes": "Attributes",
+        "Details": "Details"
+      },
+      "RewardGrant": {
+        "None": "This enemy has no reward to distribute.",
+        "NoPlayers": "No active players connected.",
+        "GrantTitle": "Grant Reward",
+        "GrantPrompt": "Draw {count} card(s) for each player? Reward: {reward}",
+        "ChatTitle": "Enemy Reward",
+        "ChatLine": "{name}: +{count} card(s)"
+      }
+    },
+    "Action": {
+      "Test": "Test",
+      "DrawCard": "Draw Card",
+      "DrawJourneyCard": "Draw Journey Card",
+      "PlayBlindJourney": "Play Blind Journey Card",
+      "Journey": "Journey",
+      "ApplyCorruptionJourney": "Resolve Corruption Journey Cards",
+      "OpenJourneyPanel": "Journey Control",
+      "OpenCombatPanel": "Combat Control",
+      "OpenGMToolsPanel": "GM Tools",
+      "Confirm": "OK",
+      "Cancel": "Cancel",
+      "GrantReward": "Grant Reward",
+      "CastWhisper": "Cast Whisper",
+      "WeaponAttack": "Weapon Attack",
+      "Initiative": "Initiative",
+      "BurnPlusOne": "Burn +One",
+      "BurnWhisper": "Burn Whisper",
+      "Heal": "Heal",
+      "Defend": "Defend",
+      "Discard": "Discard",
+      "Advance": "Advance",
+      "Challenge": "Challenge",
+      "ElementalRitual": "Elemental Ritual",
+      "OfficerShare": "Officer — Share Cards",
+      "AllyBlackCardCorruption": "Stars / Holy Day",
+      "TriggerCorruptionIncident": "Trigger Corruption Incident"
+    },
+    "Item": {
+      "Type": {
+        "Burden": "Burden",
+        "Equipment": "Equipment",
+        "Scar": "Scar"
+      }
+    },
+    "Card": {
+      "Suit": {
+        "Clubs": "Clubs",
+        "Diamonds": "Diamonds",
+        "Hearts": "Hearts",
+        "Spades": "Spades",
+        "RedJoker": "Red Joker",
+        "BlackJoker": "Black Joker"
+      },
+      "Label": {
+        "Of": "{rank} of {suit}"
+      }
+    },
+    "Deck": {
+      "Name": {
+        "Shared": "NGH Shared Deck",
+        "Discard": "NGH Discard Pile",
+        "Hand": "NGH Hand - {user} ({kind})",
+        "StandardHandSuffix": "Standard",
+        "JourneyHandSuffix": "Journey"
+      }
+    },
+    "Journey": {
+      "PanelTitle": "Journey Control",
+      "GMHand": "GM Journey Hand",
+      "EmptyGMHand": "The GM journey hand is empty.",
+      "PlayerJourneyHands": "Player Journey Hands",
+      "CardCount": "Cards: {count}",
+      "NoPlayers": "No players to display.",
+      "CorruptionTitle": "Corruption Journey Cards",
+      "CorruptionEntry": "Corruption {corruption}, cards {cards}",
+      "NoCorruptionCards": "No corruption journey cards are recommended.",
+      "Narrator": "Narrator",
+      "Phase": {
+        "Label": "Phase",
+        "configure": "Configure",
+        "collect": "Collect",
+        "deal": "Deal",
+        "reveal": "Reveal",
+        "resolve": "Resolve"
+      },
+      "PhaseChange": {
+        "Title": "Journey Phase",
+        "Now": "Phase: {phase}"
+      },
+      "Requirements": {
+        "Label": "Requirements",
+        "Placeholder": "e.g. three hearts, no sixes..."
+      },
+      "Bonus": {
+        "Label": "Bonus (if met)",
+        "Placeholder": "e.g. each player draws 1 card..."
+      },
+      "Penalty": {
+        "Label": "Penalty (if failed)",
+        "Placeholder": "e.g. all characters -1 Hart..."
+      },
+      "Collect": {
+        "Instructions": "Players play cards from their hand (minimum 1 each). GM may add blind cards from the deck."
+      },
+      "BlindCard": {
+        "MaxReached": "Maximum blind cards already added (one per player)."
+      },
+      "Deal": {
+        "CardsCollected": "cards collected.",
+        "NoCards": "No collected journey cards to deal.",
+        "NoPlayers": "No players to deal to.",
+        "MissingPlayerCards": "Every player must contribute at least one journey card first: {users}"
+      },
+      "Reveal": {
+        "Instructions": "Each player in turn reveals their card and describes a scene related to the motif.",
+        "Waiting": "(awaiting card)",
+        "Hidden": "(hidden card)"
+      },
+      "Resolve": {
+        "Instructions": "Check requirements, announce bonus or penalty. All journey cards are discarded.",
+        "Result": "Requirement result",
+        "NoRevealedCards": "Reveal journey cards before resolving requirements.",
+        "ManualRequired": "Manual resolution required (requirement text could not be parsed).",
+        "StatusMet": "Requirements met",
+        "StatusFailed": "Requirements failed",
+        "StatusUnknown": "Requirements unclear"
+      },
+      "Motif": {
+        "Spades": "Knowledge \u2014 learning, growth, overcoming suffering",
+        "Clubs": "Objects \u2014 overcoming obstacles, action, adventure",
+        "Hearts": "Relationships \u2014 emotions and bonds",
+        "Diamonds": "Self \u2014 ambition and hope",
+        "RedJoker": "Wild \u2014 any motif of your choice",
+        "BlackJoker": "Wild \u2014 any motif (Corruption risk)"
+      },
+      "Action": {
+        "StartCollect": "Start Journey \u2192 Collect",
+        "AddBlind": "Add Blind Card from Deck",
+        "Deal": "Shuffle & Deal",
+        "ShuffleAndDeal": "Shuffle & Deal Cards",
+        "RevealAll": "Reveal All Cards",
+        "RevealSlot": "Reveal Card",
+        "AutoResolve": "Auto Resolve Requirements",
+        "Resolve": "Proceed to Resolve",
+        "Finish": "Finish Journey",
+        "EndMission": "End Mission"
+      }
+    },
+    "Combat": {
+      "Weapon": {
+        "FistsWeak": "Fists (<3 Krzepa)",
+        "FistsStandard": "Fists (3-7 Krzepa)",
+        "FistsStrong": "Fists (>7 Krzepa)",
+        "Knife": "Knife",
+        "Club": "Club",
+        "SwordBayonet": "Sword / Bayonet",
+        "AxePick": "Axe / Pickaxe",
+        "Staff": "Staff",
+        "Pistol": "Pistol",
+        "Rifle": "Rifle",
+        "MachineGun": "Machine gun",
+        "Explosives": "Explosives",
+        "Grenade": "Grenade"
+      },
+      "Effect": {
+        "BonusDamage": "+1 damage",
+        "Stun": "Stun",
+        "Aim": "Aim",
+        "Overwhelm": "Overwhelm",
+        "Spray": "Spray",
+        "Flurry": "Flurry",
+        "Critical": "Critical hit",
+        "Shatter": "Shatter",
+        "Shrapnel": "Shrapnel"
+      },
+      "PanelTitle": "Combat Control",
+      "Round": "Round",
+      "Score": "Score",
+      "CurrentActor": "Now acting",
+      "Remaining": "Remaining",
+      "Acted": "Acted",
+      "AllActed": "All actors have acted.",
+      "NoEligibleStarter": "No eligible starter for the next round.",
+      "Idle": {
+        "Description": "No combat in progress. Click \"New Combat\" to begin."
+      },
+      "Phase": {
+        "Initiative": "Initiative"
+      },
+      "Action": {
+        "NewCombat": "New Combat",
+        "ResolveOrder": "Resolve Order",
+        "StartCombat": "Start Combat",
+        "GroupAttack": "Group Attack",
+        "PassTurn": "Pass Turn",
+        "EndRound": "End Round",
+        "Reset": "Reset Combat"
+      },
+      "Kind": {
+        "Character": "Character",
+        "EnemyGroup": "Enemy group"
+      },
+      "GroupInfo": "size {size}, attack {bonus}",
+      "Col": {
+        "Actor": "Actor",
+        "Kind": "Kind",
+        "Card": "Card",
+        "Score": "Score",
+        "Tie": "Tie",
+        "TieBreaker": "Tie-breaker",
+        "TieBreakerHint": "Tie-breaker card"
+      },
+      "GroupAttack": {
+        "NotEnemyTurn": "Group attack is available only on enemy group turn."
+      },
+      "Ties": {
+        "Warning": "Ties detected — enter tie-breaker cards and click Resolve Order again."
+      },
+      "EnemyGroups": {
+        "Title": "Enemy Groups",
+        "Prompt": "Enter enemy groups, one per line:"
+      },
+      "ChooseFirst": {
+        "Title": "Who Goes First?",
+        "Prompt": "The actor with highest initiative chooses who acts first:"
+      },
+      "ChooseNext": {
+        "Title": "Who Acts Next?",
+        "Prompt": "Choose who acts next:"
+      },
+      "ChooseStarter": {
+        "Title": "Next Round Starter",
+        "Prompt": "The last actor chooses who starts the next round (not themselves):"
+      }
+    },
+    "GMTools": {
+      "PanelTitle": "GameMaster Tools",
+      "Subtitle": "Session-facing quick references and checklists for Never Going Home.",
+      "Section": {
+        "CorruptionOverview": "Corruption Overview",
+        "CorruptionTriggers": "Corruption Triggers",
+        "JourneyFlow": "Journey Flow",
+        "CombatFlow": "Combat Flow",
+        "QuickReference": "Quick Reference",
+        "SessionChecklist": "Session Checklist"
+      },
+      "Label": {
+        "Corruption": "Corruption"
+      },
+      "Empty": {
+        "NoCharacters": "No character actors found."
+      },
+      "CorruptionTriggers": {
+        "BlackJoker": "Black Joker played/revealed",
+        "Burns": "Black Joker burned (+One / Whisper / Healing)",
+        "WhisperRank": "Whisper path advanced to rank 3/4/5",
+        "ElementalRitual": "Elemental Ritual with empty hand and black top-deck card",
+        "StarsHolyDay": "Stars / Holy Day when ally black card is used",
+        "Officer": "Officer card-sharing action",
+        "Incident": "GM-triggered incident"
+      },
+      "JourneyFlow": {
+        "Configure": "1. Configure requirements + bonus/penalty",
+        "Collect": "2. Collect cards (players + blind cards + corruption cards)",
+        "Deal": "3. Shuffle and deal journey cards",
+        "Reveal": "4. Reveal cards with suit motif narration",
+        "Resolve": "5. Resolve requirement outcome and finish"
+      },
+      "CombatFlow": {
+        "New": "1. New Combat: load actors and enemy groups",
+        "Initiative": "2. Initiative: assign cards, resolve ties",
+        "Start": "3. Start: highest initiative chooses first actor",
+        "Pass": "4. Active round: each actor passes turn onward",
+        "EndRound": "5. End round: last actor picks next round starter"
+      },
+      "QuickRef": {
+        "PT": "Attack PT = max(Krzepa, Armor)",
+        "Defense": "Defend with cards: 1 card prevents 1 incoming damage",
+        "Hand": "Standard hand limit: 7 cards",
+        "Corruption34": "Corruption 3 -> +1 journey card; Corruption 4 -> +2 journey cards",
+        "Corruption5": "Corruption 5: final mission state"
+      },
+      "SessionChecklist": {
+        "OpenPanels": "Open Journey / Combat / GM Tools panels",
+        "ReviewCorruption": "Review corruption track for all characters",
+        "VerifyDeck": "Verify deck/discard and reshuffle status",
+        "CheckMission": "Set mission requirements before journey starts"
+      }
+    },
+    "Common": {
+      "None": "none",
+      "Unknown": "unknown"
+    },
+    "Info": {
+      "NoCorruptionJourneyCards": "No corruption-based journey cards are currently recommended."
+    },
+    "Dialog": {
+      "InputTitle": "Input",
+      "ConfirmTitle": "Confirm",
+      "PostRollTitle": "Post-roll modifiers"
+    },
+    "Prompt": {
+      "HealAttribute": "Heal which attribute? krzepa / spryt / hart",
+      "DefenseAttribute": "Defend which attribute? krzepa / spryt / hart",
+      "IncomingDamage": "Incoming damage",
+      "Difficulty": "Difficulty (PT)",
+      "BonusDice": "Bonus dice to buy before roll",
+      "WhisperAttribute": "Whisper attribute: krzepa / spryt / hart",
+      "TempTrainingTest": "Use temporary training for this test?",
+      "ChooseWeapon": "Choose weapon id:\n{choices}",
+      "TargetKrzepa": "Target Krzepa",
+      "TargetArmor": "Target armor",
+      "TargetDefense": "Target defense / PT",
+      "BonusDiceAttack": "Bonus dice before attack",
+      "TempTrainingAttack": "Use temporary training for this attack?",
+      "AvailableEffects": "Available effects: {effects}\nType comma-separated effect keys to apply, or leave blank.",
+      "ConfirmCorruptionJourney": "Resolve {total} journey card(s) from corruption?\n{summary}",
+      "ChallengeParticipants": "Challenge participants (comma-separated actor IDs or names). Available: {available}",
+      "CorruptionIncident": "Corruption incident reason (optional)"
+    },
+    "PostRoll": {
+      "NoDice": "No dice in test. Post-roll modifiers cannot be applied.",
+      "NoBudget": "No post-roll budget (0). Reroll and +1 are unavailable.",
+      "BudgetLabel": "Post-roll budget",
+      "Help": "Reroll costs 1 total. +1 costs 1 per selected die.",
+      "TrimmedWarning": "+1 selections were reduced to fit available post-roll budget.",
+      "Table": {
+        "Index": "Index",
+        "Roll": "Roll",
+        "Reroll": "Reroll"
+      }
+    },
+    "Chat": {
+      "Result": {
+        "Success": "Result: success",
+        "Failure": "Result: failure"
+      },
+      "DrawCard": {
+        "Title": "Draw Card",
+        "Drawn": "Drawn: {drawn}",
+        "Hand": "Hand: {current}/{max}"
+      },
+      "DrawJourneyCard": {
+        "Title": "Draw Journey Card",
+        "Drawn": "Drawn: {drawn}",
+        "Hand": "Journey hand: {current}/{max}"
+      },
+      "DiscardCard": {
+        "Title": "Discard Card",
+        "Discarded": "Discarded: {card}",
+        "HandLeft": "Cards left in hand: {count}"
+      },
+      "Journey": {
+        "Title": "Journey",
+        "RevealTitle": "Journey Card Reveal",
+        "RevealedCard": "{user}: {card}",
+        "BJGMSlotTitle": "Black Joker \u2014 Blind Slot",
+        "BJGMSlotWarning": "A Black Joker appeared in a blind/surplus journey slot. Assign corruption risk to the appropriate player manually.",
+        "BJPlayerSlotAffected": "Black Joker in {user}'s journey slot \u2014 Corruption Risk:",
+        "BJCorruptionApplied": "Corruption applied to {name}.",
+        "BJNoActorWarning": "No linked character found for {user} \u2014 apply Corruption +1 manually.",
+        "ResolveTitle": "Journey Resolution",
+        "ResolveStatus": "Status: {status}",
+        "ResolveOutcome": "Outcome: {outcome}",
+        "Source": "Source: {source}",
+        "Played": "Played: {card}",
+        "DrewBlind": "Drew blind: {card}",
+        "HandLeft": "Journey hand left: {count}",
+        "BlindCard": "Blind Journey Card",
+        "BlindAdded": "Blind card drawn: {card}",
+        "DealTitle": "Journey Cards Dealt",
+        "DealtCard": "{user}: {card}",
+        "FinishTitle": "Journey Complete",
+        "Finished": "The journey phase has ended. Cards resolved.",
+        "EndMissionTitle": "Mission Complete",
+        "EndMissionAttributes": "All character attributes restored.",
+        "EndMissionReshuffle": "Reshuffled {count} cards into the draw pile.",
+        "Corruption5Title": "Corruption 5 — Final Mission",
+        "Corruption5Warning": "The following characters have reached Corruption 5. This was their last mission — they must retire from the unit.",
+        "Corruption5Actor": "• {name}"
+      },
+      "Initiative": {
+        "Title": "Initiative",
+        "Card": "Card: {card}",
+        "Score": "Score: {score}",
+        "Kept": "Card remains in hand.",
+        "Resolved": "Card was resolved from the deck or reshuffled."
+      },
+      "BurnPlusOne": {
+        "Title": "Burn Card for +One"
+      },
+      "BurnWhisper": {
+        "Title": "Burn Card for Whisper"
+      },
+      "WhisperCast": {
+        "Title": "Whisper Cast",
+        "Path": "Path: {path}",
+        "Spell": "Spell: {spell}",
+        "CostCard": "Cost paid: {card}",
+        "BurnBlack": "Black Joker burned \u2014 Corruption Risk triggered!",
+        "Failed": "Result: failure \u2014 consider additional sacrifice (path-specific)."
+      },
+      "BurnCard": {
+        "Burned": "Burned: {cards}",
+        "HandRemaining": "Remaining hand: {count}"
+      },
+      "Heal": {
+        "Title": "Heal Attribute",
+        "Burned": "Burned: {card}",
+        "Recovered": "Recovered {attribute} to {current}/{max}"
+      },
+      "Defend": {
+        "Title": "Defend with Card",
+        "Card": "Card: {card}",
+        "Attribute": "Attribute: {attribute}",
+        "Incoming": "Incoming: {incoming}",
+        "Prevented": "Prevented: {prevented}",
+        "Applied": "Applied: {applied}",
+        "Current": "Current: {current}/{max}"
+      },
+      "SkillTest": {
+        "Title": "Skill Test",
+        "Skill": "Skill: {skill}",
+        "Attribute": "Attribute: {attribute}",
+        "RollsBefore": "Rolls before post-roll: {rolls}",
+        "PostChoices": "Post-roll choices: reroll [{reroll}], +1 [{increase}]",
+        "RollsFinal": "Rolls final: {rolls}",
+        "Successes": "Successes: {successes}/{difficulty}"
+      },
+      "Challenge": {
+        "Title": "Group Challenge",
+        "Skill": "Skill: {skill}",
+        "Difficulty": "Difficulty: {difficulty}",
+        "Total": "Total successes: {successes}",
+        "Participant": "{participant}: {successes} success(es) [{rolls}]"
+      },
+      "WeaponAttack": {
+        "Title": "Weapon Attack",
+        "Weapon": "Weapon: {weapon}",
+        "RollsBefore": "Rolls before post-roll: {rolls}",
+        "PostChoices": "Post-roll choices: reroll [{reroll}], +1 [{increase}]",
+        "RollsFinal": "Rolls final: {rolls}",
+        "Successes": "Successes: {successes}",
+        "Hit": "Hit for {damage} damage.",
+        "Miss": "Miss.",
+        "Effects": "Effects: {effects}",
+        "EffectsNone": "Effects: none"
+      },
+      "ElementalRitual": {
+        "Title": "Elemental Ritual",
+        "Drew": "Drew from deck: {card}",
+        "Paid": "Discarded from hand: {card}",
+        "NoDraw": "No card available in deck.",
+        "Black": "Black card - Corruption Risk triggered.",
+        "Red": "Red card - no corruption risk.",
+        "FromHand": "Cost paid from hand."
+      },
+      "OfficerShare": {
+        "Title": "Officer - Cards Shared",
+        "Card": "{user}: {card}",
+        "NoneDrawn": "No cards could be drawn from the deck."
+      },
+      "CorruptionJourney": {
+        "Title": "Corruption Journey Cards",
+        "Total": "Resolved cards: {total}",
+        "Drawn": "Drawn: {cards}",
+        "Entry": "{actor}: corruption {corruption}, cards {cards}"
+      },
+      "CorruptionRisk": {
+        "Title": "Corruption Risk",
+        "Reason": "Reason: {reason}",
+        "JokerSkipped": "Joker skipped and reshuffled: {joker}",
+        "Card": "Card drawn: {card}",
+        "Black": "Black card — Corruption +1",
+        "Red": "Red card \u2014 no corruption."
+      },
+      "Combat": {
+        "StartTitle": "Combat Started",
+        "Round": "Round {round}",
+        "FirstActor": "First actor: {actor}",
+        "PassTitle": "Initiative Passed",
+        "NextActor": "Next: {actor}",
+        "NewRoundTitle": "New Round",
+        "GroupAttack": {
+          "Title": "Enemy Group Attack",
+          "Group": "Group: {group}",
+          "Dice": "Dice: {dice}",
+          "Rolls": "Rolls: {rolls}",
+          "Successes": "Successes: {successes}"
+        }
+      },
+      "Advancement": {
+        "Title": "Advancement",
+        "Attribute": "{attr}: {from} \u2192 {to}",
+        "Skill": "{skill}: rank {from} \u2192 {to}",
+        "NewSkill": "New skill: {skill} (rank {rank})",
+        "Whisper": "Whisper {path}: rank {from} \u2192 {to}",
+        "Spent": "Cards spent: {cards}",
+        "SameColor": "Same color \u2014 1 card kept.",
+        "FacesBonus": "All faces/aces \u2014 effect +1!"      }
+    },
+    "CorruptionRisk": {
+      "Reason": {
+        "BlackJokerInitiative": "Black Joker — Initiative",
+        "BlackJokerJourney": "Black Joker \u2014 Journey",
+        "BlackJokerBurnPlusOne": "Black Joker \u2014 Burn for +One",
+        "BlackJokerBurnWhisper": "Black Joker \u2014 Burn for Whisper",
+        "BlackJokerBurnHeal": "Black Joker \u2014 Burn for Healing",
+        "ElementalRitual": "Elemental Ritual \u2014 no cards in hand",
+        "StarsHolyDay": "Stars / Holy Day \u2014 ally black card",
+        "ManualIncident": "GM corruption incident",
+        "ManualIncidentDetail": "Incident: {detail}",
+        "OfficerShare": "Officer \u2014 sharing cards with squad",
+        "WhisperAdvancement": "Whisper {path} advanced to rank {rank}",
+        "WhisperBurn": "Whisper burn \u2014 Black Joker ({path})"
+      }
+    },
+    "Whisper": {
+      "Cast": {
+        "NotLearned": "This whisper path has not been learned yet.",
+        "SpellPrompt": "Spell name for path \"{path}\" (leave blank to skip):",
+        "CostTitle": "Pay Whisper Cost",
+        "CostHint": "Select 1 card from hand to burn as whisper casting cost for path \"{path}\"."
+      }
+    },
+    "Officer": {
+      "NoActivePlayers": "No active players found.",
+      "DialogTitle": "Officer \u2014 Share 4 Cards",
+      "DialogHint": "You will risk Corruption, then draw 4 cards from the deck and assign each to a player.",
+      "CardSlot": "Card {n}",
+      "CardPrompt": "Card {n} recipient ({players})"
+    },
+    "ElementalRitual": {
+      "SelectCostCard": "Select a card to pay Elemental Ritual cost."
+    },
+    "Advancement": {
+      "NoCardsInHand": "No cards in hand.",
+      "AtMaximum": "Already at maximum.",
+      "Select": "Select",
+      "Card": "Card",
+      "AdvanceAttribute": "Advance Attribute",
+      "AdvanceSkill": "Advance Skill",
+      "AcquireSkill": "Acquire Skill",
+      "AdvanceWhisper": "Advance Whisper Path",
+      "AttributeHint": "Advance {attr}: {current} \u2192 {next}. Cost: {cost} red cards. Same color keeps 1 back. All faces/aces: effect +1.",
+      "SkillDieHint": "Advance {skill}: rank {current} \u2192 {next}. Cost: {cost} cards.",
+      "NewSkillHint": "Acquire {skill}. Cost: {cost} cards.",
+      "WhisperHint": "Advance whisper {path}: rank {current} \u2192 {next}. Cost: {cost} cards.",
+      "Error": {
+        "AttributeRedOnly": "Attribute advancement requires only red cards (\u2665/\u2666)."
+      }
+    },
+    "Error": {
+      "ActionFailed": "Action failed",
+      "ApiUnavailable": "NGH API is not available",
+      "MissingActiveUser": "Missing active user",
+      "CardCodeRequired": "Card action requires a card code",
+      "SkillKeyRequired": "Skill test action requires a skill key",
+      "CardNotInHand": "Card {card} is not in the user's hand",
+      "CardNotInJourneyHand": "Card {card} is not in the user's journey hand",
+      "MissingJourneyUserId": "Missing userId for journey card use",
+      "JourneyCardRequired": "A card from hand must be selected for journey use",
+      "GMOnlyJourneyPanel": "Only the GM can open Journey control",
+      "GMOnlyCombatPanel": "Only the GM can open Combat Control",
+      "GMOnlyGMToolsPanel": "Only the GM can open GM Tools",
+      "MissingInitiativeUserId": "Missing userId for initiative card use",
+      "InitiativeCardRequired": "A card from hand must be selected for initiative",
+      "MissingBurnUserId": "Missing userId for card burn",
+      "BurnCardRequired": "At least one card must be burned",
+      "RitualCardRequired": "Select a card from hand for Elemental Ritual.",
+      "AdvancementCardsRequired": "Advancement requires {required} cards",
+      "WhisperAttributeOverrideRequired": "Whisper tests require an explicit attributeOverride",
+      "ModifierBudgetExceededBeforeRoll": "Modifier budget exceeded before roll",
+      "ModifierBudgetExceededReroll": "Modifier budget exceeded when applying reroll",
+      "ModifierBudgetExceededIncrease": "Modifier budget exceeded when increasing dice",
+      "FoundryCardsUnavailable": "Foundry Cards collection is not available",
+      "GMOnlyDeckManagement": "Only the GM can manage the shared Foundry card stacks",
+      "ManageOwnHandOnly": "You can only manage your own hand",
+      "DeckNotInitialized": "NGH card stacks are not initialized yet. Let the GM finish loading the world first.",
+      "MissingDrawUserId": "Missing userId for draw operation",
+      "MissingDiscardUserId": "Missing userId for discard operation",
+      "UserHandMissing": "User hand does not exist",
+      "MissingReturnUserId": "Missing userId for return-to-deck operation",
+      "UnknownWeaponProfile": "Unknown weapon profile: {weaponId}",
+      "UnsupportedWeaponEffect": "Weapon {weaponId} does not support effect {effect}",
+      "WeaponEffectsExceedSurplus": "Selected weapon effects exceed available surplus successes"
+    }
+  },
+  "TYPES": {
+    "Actor": {
+      "character": "NGH.Actor.Type.Character"
+    },
+    "Item": {
+      "burden": "NGH.Item.Type.Burden",
+      "equipment": "NGH.Item.Type.Equipment",
+      "scar": "NGH.Item.Type.Scar"
+    }
+  },
+  "Reveal": {
+          "InvalidSlot": "Invalid slot index.",
+          "AlreadyRevealed": "This card is already revealed."
+    }
+}

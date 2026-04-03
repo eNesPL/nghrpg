@@ -1,0 +1,109 @@
+<section class="{{cssClass}} ngh combat-panel">
+  <header class="sheet-header journey-panel__header">
+    <h1 class="sheet-title">{{panelTitle}}</h1>
+    {{#if isActive}}
+    <div class="journey-phase-badge">{{roundLabel}} {{round}}</div>
+    {{/if}}
+  </header>
+
+  {{!-- ===== IDLE PHASE ===== --}}
+  {{#if isIdle}}
+  <div class="journey-panel__section">
+    <p class="panel-note">{{localize "NGH.Combat.Idle.Description"}}</p>
+    <div class="action-toolbar">
+      <button type="button" class="action-button" data-action="combat-new">{{localize "NGH.Combat.Action.NewCombat"}}</button>
+    </div>
+  </div>
+  {{/if}}
+
+  {{!-- ===== INITIATIVE PHASE ===== --}}
+  {{#if isInitiative}}
+  <div class="journey-panel__section">
+    <h2 class="panel-title">{{localize "NGH.Combat.Phase.Initiative"}}</h2>
+    {{#if hasTies}}
+    <div class="panel-note ngh-warning">⚠️ {{localize "NGH.Combat.Ties.Warning"}}</div>
+    {{/if}}
+    <table class="ngh-initiative-table">
+      <thead>
+        <tr>
+          <th>{{localize "NGH.Combat.Col.Actor"}}</th>
+          <th>{{localize "NGH.Combat.Col.Kind"}}</th>
+          <th>{{localize "NGH.Combat.Col.Card"}}</th>
+          <th>{{localize "NGH.Combat.Col.Score"}}</th>
+          <th>{{localize "NGH.Combat.Col.Tie"}}</th>
+          <th>{{localize "NGH.Combat.Col.TieBreaker"}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each entries}}
+        <tr{{#if tied}} class="ngh-tied-row"{{/if}}>
+          <td class="ngh-actor-name">{{label}}</td>
+          <td class="ngh-actor-kind">{{kindLabel}}{{#if isEnemyGroup}}<br /><small>{{groupInfo}}</small>{{/if}}</td>
+          <td><input type="text" name="card-{{id}}" value="{{card}}" placeholder="AS, 10H…" class="ngh-card-input" /></td>
+          <td class="ngh-score-cell">{{score}}</td>
+          <td class="ngh-tie-cell">{{#if tied}}⚠{{/if}}</td>
+          <td>{{#if tied}}<input type="text" name="tb-{{id}}" value="{{tieBreakerCard}}" placeholder="{{localize "NGH.Combat.Col.TieBreakerHint"}}" class="ngh-card-input" />{{/if}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <div class="action-toolbar">
+      <button type="button" class="action-button" data-action="combat-resolve-order">{{localize "NGH.Combat.Action.ResolveOrder"}}</button>
+      {{#if canStartCombat}}
+      <button type="button" class="action-button" data-action="combat-start">{{localize "NGH.Combat.Action.StartCombat"}}</button>
+      {{/if}}
+    </div>
+    <div class="action-toolbar">
+      <button type="button" class="action-button ngh-reset-btn" data-action="combat-reset">{{localize "NGH.Combat.Action.Reset"}}</button>
+    </div>
+  </div>
+  {{/if}}
+
+  {{!-- ===== ACTIVE PHASE ===== --}}
+  {{#if isActive}}
+  <div class="journey-panel__section">
+    {{#if activeEntry}}
+    <div class="ngh-active-actor-badge">
+      <strong>{{localize "NGH.Combat.CurrentActor"}}:</strong> {{activeEntry.label}}
+    </div>
+    {{/if}}
+
+    <div class="ngh-combat-columns">
+      <div class="ngh-combat-col">
+        <h3 class="panel-subtitle">{{localize "NGH.Combat.Remaining"}} ({{unacted.length}})</h3>
+        <ul class="ngh-actor-list">
+          {{#each unacted}}
+          <li{{#if isCurrentActor}} class="ngh-current-actor"{{/if}}>{{label}}</li>
+          {{/each}}
+          {{#unless unacted.length}}
+          <li class="empty-note">{{localize "NGH.Combat.AllActed"}}</li>
+          {{/unless}}
+        </ul>
+      </div>
+      <div class="ngh-combat-col">
+        <h3 class="panel-subtitle">{{localize "NGH.Combat.Acted"}} ({{acted.length}})</h3>
+        <ul class="ngh-actor-list">
+          {{#each acted}}
+          <li class="ngh-acted-actor">{{label}}</li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+
+    <div class="action-toolbar">
+      {{#if canEnemyGroupAttack}}
+      <button type="button" class="action-button" data-action="combat-group-attack">{{localize "NGH.Combat.Action.GroupAttack"}}</button>
+      {{/if}}
+      {{#unless isLastToAct}}
+      <button type="button" class="action-button" data-action="combat-pass-turn">{{localize "NGH.Combat.Action.PassTurn"}}</button>
+      {{/unless}}
+      {{#if isLastToAct}}
+      <button type="button" class="action-button" data-action="combat-end-round">{{localize "NGH.Combat.Action.EndRound"}}</button>
+      {{/if}}
+    </div>
+    <div class="action-toolbar">
+      <button type="button" class="action-button ngh-reset-btn" data-action="combat-reset">{{localize "NGH.Combat.Action.Reset"}}</button>
+    </div>
+  </div>
+  {{/if}}
+</section>

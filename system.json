@@ -1,0 +1,79 @@
+{
+  "id": "nghrpg",
+  "title": "Never Going Home",
+  "description": "Unofficial system for playing Never Going Home in Foundry VTT.",
+  "version": "0.1.42",
+  "compatibility": {
+    "minimum": 12,
+    "verified": 13
+  },
+  "authors": [
+    {
+      "name": "eNes"
+    }
+  ],
+  "esmodules": [
+    "scripts/ngh-system.js"
+  ],
+  "styles": [
+    "styles/ngh.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "pl",
+      "name": "Polski",
+      "path": "lang/pl.json"
+    }
+  ],
+  "packs": [
+    {
+      "name": "enemies",
+      "label": "NGH Enemies",
+      "path": "packs/enemies.db",
+      "type": "Actor",
+      "system": "nghrpg"
+    },
+    {
+      "name": "book-of-whispers",
+      "label": "NGH Book of Whispers",
+      "path": "packs/book-of-whispers.db",
+      "type": "Actor",
+      "system": "nghrpg"
+    },
+    {
+      "name": "corrupted-beasts",
+      "label": "NGH Corrupted Beasts",
+      "path": "packs/corrupted-beasts.db",
+      "type": "Actor",
+      "system": "nghrpg"
+    }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "character": {},
+      "npc": {}
+    },
+    "Item": {
+      "burden": {},
+      "equipment": {},
+      "scar": {}
+    }
+  },
+  "socket": false,
+  "initiative": "1d20",
+  "grid": {
+    "distance": 5,
+    "units": "m"
+  },
+  "primaryTokenAttribute": null,
+  "secondaryTokenAttribute": null,
+  "url": "",
+  "manifest": "",
+  "download": "",
+  "license": "MIT"
+}

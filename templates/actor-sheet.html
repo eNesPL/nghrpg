@@ -1,0 +1,267 @@
+<form class="{{cssClass}} ngh" autocomplete="off">
+  <header class="sheet-header">
+    <h1 class="sheet-title">{{localize "NGH.Actor.SoldierRecord"}}</h1>
+    <label class="identity-row">
+      <span>{{localize "NGH.Actor.Name"}}</span>
+      <input type="text" name="name" value="{{actor.name}}" />
+    </label>
+  </header>
+
+  <section class="record-columns">
+    <div class="record-panel recruitment-panel">
+      <h2 class="panel-title">{{localize "NGH.Actor.Section.Attributes"}}</h2>
+
+      <label class="track-field attribute-row">
+        <div>
+          <span>{{localize "NGH.Actor.Attribute.Krzepa"}}</span>
+          <small>{{localize "NGH.Actor.Attribute.KrzepaHint"}}</small>
+        </div>
+        <div class="attribute-pair">
+          <input type="number" min="0" max="10" step="1" name="system.attributes.krzepa.value" value="{{system.attributes.krzepa.value}}" />
+          <span>/</span>
+          <input type="number" min="1" max="10" step="1" name="system.attributes.krzepa.max" value="{{system.attributes.krzepa.max}}" />
+          <button type="button" class="action-button action-button--sm" data-action="advance-attribute" data-attribute="krzepa">{{localize "NGH.Action.Advance"}}</button>
+        </div>
+      </label>
+
+      <label class="track-field attribute-row">
+        <div>
+          <span>{{localize "NGH.Actor.Attribute.Spryt"}}</span>
+          <small>{{localize "NGH.Actor.Attribute.SprytHint"}}</small>
+        </div>
+        <div class="attribute-pair">
+          <input type="number" min="0" max="10" step="1" name="system.attributes.spryt.value" value="{{system.attributes.spryt.value}}" />
+          <span>/</span>
+          <input type="number" min="1" max="10" step="1" name="system.attributes.spryt.max" value="{{system.attributes.spryt.max}}" />
+          <button type="button" class="action-button action-button--sm" data-action="advance-attribute" data-attribute="spryt">{{localize "NGH.Action.Advance"}}</button>
+        </div>
+      </label>
+
+      <label class="track-field attribute-row">
+        <div>
+          <span>{{localize "NGH.Actor.Attribute.Hart"}}</span>
+          <small>{{localize "NGH.Actor.Attribute.HartHint"}}</small>
+        </div>
+        <div class="attribute-pair">
+          <input type="number" min="0" max="10" step="1" name="system.attributes.hart.value" value="{{system.attributes.hart.value}}" />
+          <span>/</span>
+          <input type="number" min="1" max="10" step="1" name="system.attributes.hart.max" value="{{system.attributes.hart.max}}" />
+          <button type="button" class="action-button action-button--sm" data-action="advance-attribute" data-attribute="hart">{{localize "NGH.Action.Advance"}}</button>
+        </div>
+      </label>
+
+      <label class="track-field attribute-row">
+        <div>
+          <span>{{localize "NGH.Actor.Armor"}}</span>
+          <small>{{localize "NGH.Actor.ArmorHint"}}</small>
+        </div>
+        <div class="attribute-pair single">
+          <input type="number" min="0" max="10" step="1" name="system.armor" value="{{system.armor}}" />
+        </div>
+      </label>
+
+      <h2 class="panel-title">{{localize "NGH.Actor.Section.AssignedEquipment"}}</h2>
+      <label class="text-block record-text">
+        <textarea name="system.records.assignedEquipment">{{system.records.assignedEquipment}}</textarea>
+      </label>
+
+      <h2 class="panel-title">{{localize "NGH.Actor.Section.ServiceRecord"}}</h2>
+      <label class="text-block record-text">
+        <textarea name="system.records.serviceRecord">{{system.records.serviceRecord}}</textarea>
+      </label>
+
+      <h2 class="panel-title">{{localize "NGH.Actor.Section.PersonalHistory"}}</h2>
+      <label class="text-block record-text personal-history">
+        <textarea name="system.records.personalHistory">{{system.records.personalHistory}}</textarea>
+      </label>
+
+      {{#if canViewCorruption}}
+      <h2 class="panel-title corruption-title">{{localize "NGH.Actor.Section.Corruption"}}</h2>
+      <label class="track-field corruption-field">
+        <span>{{localize "NGH.Actor.CorruptionLabel"}}</span>
+        <input type="number" min="0" max="5" step="1" name="system.corruption" value="{{system.corruption}}" />
+        <small>{{localize "NGH.Actor.GMOnly"}}</small>
+      </label>
+      {{/if}}
+    </div>
+
+    <div class="record-panel training-panel">
+      <h2 class="panel-title">{{localize "NGH.Actor.Section.Skills"}}</h2>
+
+      <div class="skill-grid">
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.Atletyka"}}</span><small>{{localize "NGH.Actor.Attribute.Krzepa"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.atletyka.trained" {{checked system.skills.atletyka.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.atletyka.rank" value="{{system.skills.atletyka.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="atletyka">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="atletyka">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="atletyka">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.WalkaWrecz"}}</span><small>{{localize "NGH.Actor.Attribute.Krzepa"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.walkaWrecz.trained" {{checked system.skills.walkaWrecz.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.walkaWrecz.rank" value="{{system.skills.walkaWrecz.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="walkaWrecz">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="walkaWrecz">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="walkaWrecz">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.Skradanie"}}</span><small>{{localize "NGH.Actor.Attribute.Krzepa"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.skradanie.trained" {{checked system.skills.skradanie.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.skradanie.rank" value="{{system.skills.skradanie.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="skradanie">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="skradanie">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="skradanie">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.Komunikacja"}}</span><small>{{localize "NGH.Actor.Attribute.Spryt"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.komunikacja.trained" {{checked system.skills.komunikacja.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.komunikacja.rank" value="{{system.skills.komunikacja.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="komunikacja">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="komunikacja">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="komunikacja">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.Wiedza"}}</span><small>{{localize "NGH.Actor.Attribute.Spryt"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.wiedza.trained" {{checked system.skills.wiedza.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.wiedza.rank" value="{{system.skills.wiedza.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="wiedza">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="wiedza">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="wiedza">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.Mechanika"}}</span><small>{{localize "NGH.Actor.Attribute.Spryt"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.mechanika.trained" {{checked system.skills.mechanika.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.mechanika.rank" value="{{system.skills.mechanika.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="mechanika">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="mechanika">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="mechanika">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.Sledztwo"}}</span><small>{{localize "NGH.Actor.Attribute.Hart"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.sledztwo.trained" {{checked system.skills.sledztwo.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.sledztwo.rank" value="{{system.skills.sledztwo.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="sledztwo">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="sledztwo">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="sledztwo">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.WalkaDystansowa"}}</span><small>{{localize "NGH.Actor.Attribute.Hart"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.walkaDystansowa.trained" {{checked system.skills.walkaDystansowa.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.walkaDystansowa.rank" value="{{system.skills.walkaDystansowa.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="walkaDystansowa">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="walkaDystansowa">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="walkaDystansowa">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.Transport"}}</span><small>{{localize "NGH.Actor.Attribute.Hart"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.transport.trained" {{checked system.skills.transport.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.transport.rank" value="{{system.skills.transport.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="transport">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="transport">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="transport">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-copy"><span>{{localize "NGH.Actor.Skill.Szepty"}}</span><small>{{localize "NGH.Actor.Skill.SzeptyHint"}}</small></div>
+          <div class="skill-controls"><label class="check-inline"><input type="checkbox" name="system.skills.szepty.trained" {{checked system.skills.szepty.trained}} /><span>{{localize "NGH.Actor.Trained"}}</span></label><input class="skill-rank" type="number" min="0" max="5" step="1" name="system.skills.szepty.rank" value="{{system.skills.szepty.rank}}" /><button type="button" class="action-button" data-action="skill-test" data-skill="szepty">{{localize "NGH.Action.Test"}}</button><button type="button" class="action-button action-button--sm" data-action="challenge-test" data-skill="szepty">{{localize "NGH.Action.Challenge"}}</button><button type="button" class="action-button action-button--sm" data-action="advance-skill" data-skill="szepty">{{localize "NGH.Action.Advance"}}</button></div>
+        </div>
+      </div>
+
+      <h2 class="panel-title">{{localize "NGH.Actor.Section.Whispers"}}</h2>
+
+      <div class="whisper-block">
+        <label class="field-inline">
+          <span>{{localize "NGH.Actor.Whisper.PathName"}}</span>
+          <input type="text" name="system.whispers.first.name" value="{{system.whispers.first.name}}" />
+        </label>
+        <label class="field-inline">
+          <span>{{localize "NGH.Actor.Whisper.Attribute"}}</span>
+          <input type="text" name="system.whispers.first.attribute" value="{{system.whispers.first.attribute}}" />
+        </label>
+        <label class="field-inline">
+          <span>{{localize "NGH.Actor.Rank"}}</span>
+          <input type="number" min="0" max="5" step="1" name="system.whispers.first.rank" value="{{system.whispers.first.rank}}" />
+          <button type="button" class="action-button action-button--sm" data-action="advance-whisper" data-whisper="first">{{localize "NGH.Action.Advance"}}</button>
+          <button type="button" class="action-button action-button--sm" data-action="cast-whisper" data-whisper="first">{{localize "NGH.Action.CastWhisper"}}</button>
+        </label>
+        </label>
+        <label class="text-block compact">
+          <span>{{localize "NGH.Actor.Whisper.Notes"}}</span>
+          <textarea name="system.whispers.first.notes">{{system.whispers.first.notes}}</textarea>
+        </label>
+      </div>
+
+      <div class="whisper-block">
+        <label class="field-inline">
+          <span>{{localize "NGH.Actor.Whisper.PathName"}}</span>
+          <input type="text" name="system.whispers.second.name" value="{{system.whispers.second.name}}" />
+        </label>
+        <label class="field-inline">
+          <span>{{localize "NGH.Actor.Whisper.Attribute"}}</span>
+          <input type="text" name="system.whispers.second.attribute" value="{{system.whispers.second.attribute}}" />
+        </label>
+        <label class="field-inline">
+          <span>{{localize "NGH.Actor.Rank"}}</span>
+          <input type="number" min="0" max="5" step="1" name="system.whispers.second.rank" value="{{system.whispers.second.rank}}" />
+          <button type="button" class="action-button action-button--sm" data-action="advance-whisper" data-whisper="second">{{localize "NGH.Action.Advance"}}</button>
+          <button type="button" class="action-button action-button--sm" data-action="cast-whisper" data-whisper="second">{{localize "NGH.Action.CastWhisper"}}</button>
+        </label>
+        <label class="text-block compact">
+          <span>{{localize "NGH.Actor.Whisper.KnownSpells"}}</span>
+          <textarea name="system.whispers.second.knownSpells">{{system.whispers.second.knownSpells}}</textarea>
+        </label>
+        <label class="text-block compact">
+          <span>{{localize "NGH.Actor.Whisper.Notes"}}</span>
+          <textarea name="system.whispers.second.notes">{{system.whispers.second.notes}}</textarea>
+        </label>
+      </div>
+
+      <div class="whisper-block">
+        <label class="field-inline">
+          <span>{{localize "NGH.Actor.Whisper.PathName"}}</span>
+          <input type="text" name="system.whispers.third.name" value="{{system.whispers.third.name}}" />
+        </label>
+        <label class="field-inline">
+          <span>{{localize "NGH.Actor.Whisper.Attribute"}}</span>
+          <input type="text" name="system.whispers.third.attribute" value="{{system.whispers.third.attribute}}" />
+        </label>
+        <label class="field-inline">
+          <span>{{localize "NGH.Actor.Rank"}}</span>
+          <input type="number" min="0" max="5" step="1" name="system.whispers.third.rank" value="{{system.whispers.third.rank}}" />
+          <button type="button" class="action-button action-button--sm" data-action="advance-whisper" data-whisper="third">{{localize "NGH.Action.Advance"}}</button>
+          <button type="button" class="action-button action-button--sm" data-action="cast-whisper" data-whisper="third">{{localize "NGH.Action.CastWhisper"}}</button>
+        </label>
+        <label class="text-block compact">
+          <span>{{localize "NGH.Actor.Whisper.KnownSpells"}}</span>
+          <textarea name="system.whispers.third.knownSpells">{{system.whispers.third.knownSpells}}</textarea>
+        </label>
+        <label class="text-block compact">
+          <span>{{localize "NGH.Actor.Whisper.Notes"}}</span>
+          <textarea name="system.whispers.third.notes">{{system.whispers.third.notes}}</textarea>
+        </label>
+      </div>
+
+      <h2 class="panel-title">{{localize "NGH.Actor.Section.Actions"}}</h2>
+      <div class="action-toolbar sheet-ops">
+        <button type="button" class="action-button" data-action="draw-card">{{localize "NGH.Action.DrawCard"}}</button>
+        <button type="button" class="action-button" data-action="draw-journey-card">{{localize "NGH.Action.DrawJourneyCard"}}</button>
+        <button type="button" class="action-button" data-action="play-blind-journey">{{localize "NGH.Action.PlayBlindJourney"}}</button>
+        <button type="button" class="action-button" data-action="weapon-attack">{{localize "NGH.Action.WeaponAttack"}}</button>
+        <button type="button" class="action-button" data-action="elemental-ritual">{{localize "NGH.Action.ElementalRitual"}}</button>
+        <button type="button" class="action-button" data-action="officer-share">{{localize "NGH.Action.OfficerShare"}}</button>
+        <button type="button" class="action-button" data-action="ally-black-card-corruption">{{localize "NGH.Action.AllyBlackCardCorruption"}}</button>
+        {{#if canTriggerCorruptionIncident}}
+        <button type="button" class="action-button" data-action="gm-corruption-incident">{{localize "NGH.Action.TriggerCorruptionIncident"}}</button>
+        {{/if}}
+      </div>
+
+      <h2 class="panel-title">{{localize "NGH.Actor.Section.Hand"}} ({{playerHand.length}}/{{maxHandSize}})</h2>
+      <div class="hand-list">
+        {{#if playerHand.length}}
+          {{#each playerHand}}
+          <div class="hand-card">
+            <div class="hand-card__copy">
+              <strong>{{this.code}}</strong>
+              <small>{{this.label}}</small>
+            </div>
+            <div class="hand-card__actions">
+              <button type="button" class="action-button small" data-action="initiative-card" data-card="{{this.code}}">{{localize "NGH.Action.Initiative"}}</button>
+              <button type="button" class="action-button small" data-action="burn-plus-one" data-card="{{this.code}}">{{localize "NGH.Action.BurnPlusOne"}}</button>
+              <button type="button" class="action-button small" data-action="burn-whisper" data-card="{{this.code}}">{{localize "NGH.Action.BurnWhisper"}}</button>
+              <button type="button" class="action-button small" data-action="heal-card" data-card="{{this.code}}">{{localize "NGH.Action.Heal"}}</button>
+              <button type="button" class="action-button small" data-action="defend-card" data-card="{{this.code}}">{{localize "NGH.Action.Defend"}}</button>
+              <button type="button" class="action-button small" data-action="discard-card" data-card="{{this.code}}">{{localize "NGH.Action.Discard"}}</button>
+            </div>
+          </div>
+          {{/each}}
+        {{else}}
+          <p class="empty-note">{{localize "NGH.Actor.EmptyHand"}}</p>
+        {{/if}}
+      </div>
+
+      <h2 class="panel-title">{{localize "NGH.Actor.Section.JourneyHand"}} ({{journeyHand.length}}/{{maxJourneyHandSize}})</h2>
+      <div class="hand-list journey-hand-list">
+        {{#if journeyHand.length}}
+          {{#each journeyHand}}
+          <div class="hand-card journey-hand-card">
+            <div class="hand-card__copy">
+              <strong>{{this.code}}</strong>
+              <small>{{this.label}}</small>
+            </div>
+            <div class="hand-card__actions">
+              <button type="button" class="action-button small" data-action="journey-card" data-card="{{this.code}}">{{localize "NGH.Action.Journey"}}</button>
+            </div>
+          </div>
+          {{/each}}
+        {{else}}
+          <p class="empty-note">{{localize "NGH.Actor.EmptyJourneyHand"}}</p>
+        {{/if}}
+      </div>
+    </div>
+  </section>
+</form>
+

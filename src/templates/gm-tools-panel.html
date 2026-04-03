@@ -1,0 +1,69 @@
+<section class="{{cssClass}} ngh gm-tools-panel">
+  <header class="sheet-header gm-tools-panel__header">
+    <h1 class="sheet-title">{{panelTitle}}</h1>
+    <p class="panel-note">{{subtitle}}</p>
+  </header>
+
+  <div class="gm-tools-grid">
+    <article class="gm-tools-card">
+      <h2 class="panel-title">{{localize "NGH.GMTools.Section.CorruptionOverview"}}</h2>
+      {{#if hasCorruptionActors}}
+      <div class="gm-tools-corruption-list">
+        {{#each corruptionActors}}
+        <div class="gm-tools-corruption-row">
+          <strong>{{this.name}}</strong>
+          <span>{{localize "NGH.GMTools.Label.Corruption"}}: {{this.corruption}}</span>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <p class="empty-note">{{localize "NGH.GMTools.Empty.NoCharacters"}}</p>
+      {{/if}}
+    </article>
+
+    <article class="gm-tools-card">
+      <h2 class="panel-title">{{localize "NGH.GMTools.Section.CorruptionTriggers"}}</h2>
+      <ul class="gm-tools-list">
+        {{#each corruptionTriggers}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </article>
+
+    <article class="gm-tools-card">
+      <h2 class="panel-title">{{localize "NGH.GMTools.Section.JourneyFlow"}}</h2>
+      <ol class="gm-tools-list gm-tools-list--ordered">
+        {{#each journeyFlow}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ol>
+    </article>
+
+    <article class="gm-tools-card">
+      <h2 class="panel-title">{{localize "NGH.GMTools.Section.CombatFlow"}}</h2>
+      <ol class="gm-tools-list gm-tools-list--ordered">
+        {{#each combatFlow}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ol>
+    </article>
+
+    <article class="gm-tools-card">
+      <h2 class="panel-title">{{localize "NGH.GMTools.Section.QuickReference"}}</h2>
+      <ul class="gm-tools-list">
+        {{#each quickReference}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </article>
+
+    <article class="gm-tools-card">
+      <h2 class="panel-title">{{localize "NGH.GMTools.Section.SessionChecklist"}}</h2>
+      <ul class="gm-tools-list">
+        {{#each sessionChecklist}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </article>
+  </div>
+</section>

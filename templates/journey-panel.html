@@ -1,0 +1,227 @@
+<section class="{{cssClass}} ngh journey-panel">
+  <header class="sheet-header journey-panel__header">
+    <h1 class="sheet-title">{{panelTitle}}</h1>
+    <div class="journey-phase-badge">{{localize "NGH.Journey.Phase.Label"}}: <strong>{{phaseLabel}}</strong></div>
+  </header>
+
+  <!-- ===== PHASE: CONFIGURE ===== -->
+  {{#if isConfigure}}
+  <div class="journey-panel__section">
+    <h2 class="panel-title">{{localize "NGH.Journey.Phase.configure"}}</h2>
+    <div class="field-group">
+      <label class="field-label">{{localize "NGH.Journey.Requirements.Label"}}</label>
+      <textarea name="journey-requirements" class="journey-requirements-input" rows="3" placeholder="{{localize "NGH.Journey.Requirements.Placeholder"}}">{{requirements}}</textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label">{{localize "NGH.Journey.Bonus.Label"}}</label>
+      <textarea name="journey-bonus" class="journey-requirements-input" rows="2" placeholder="{{localize "NGH.Journey.Bonus.Placeholder"}}">{{bonus}}</textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label">{{localize "NGH.Journey.Penalty.Label"}}</label>
+      <textarea name="journey-penalty" class="journey-requirements-input" rows="2" placeholder="{{localize "NGH.Journey.Penalty.Placeholder"}}">{{penalty}}</textarea>
+    </div>
+    <div class="action-toolbar">
+      <button type="button" class="action-button" data-action="journey-start-collect">{{localize "NGH.Journey.Action.StartCollect"}}</button>
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- ===== PHASE: COLLECT ===== -->
+  {{#if isCollect}}
+  <div class="journey-panel__section">
+    <h2 class="panel-title">{{localize "NGH.Journey.Phase.collect"}}</h2>
+    {{#if requirements}}
+    <div class="journey-requirements-display">
+      <strong>{{localize "NGH.Journey.Requirements.Label"}}:</strong> {{requirements}}
+    </div>
+    {{/if}}
+    {{#if bonus}}
+    <div class="journey-bonus-display">
+      <strong>{{localize "NGH.Journey.Bonus.Label"}}:</strong> {{bonus}}
+    </div>
+    {{/if}}
+    {{#if penalty}}
+    <div class="journey-penalty-display">
+      <strong>{{localize "NGH.Journey.Penalty.Label"}}:</strong> {{penalty}}
+    </div>
+    {{/if}}
+    <p class="panel-note">{{localize "NGH.Journey.Collect.Instructions"}}</p>
+    <div class="action-toolbar">
+      <button type="button" class="action-button" data-action="journey-add-blind">{{localize "NGH.Journey.Action.AddBlind"}}</button>
+      <button type="button" class="action-button" data-action="journey-deal" {{#unless canDealFromCollect}}disabled{{/unless}}>{{localize "NGH.Journey.Action.Deal"}} ({{totalCollected}})</button>
+    </div>
+
+    <h3 class="panel-subtitle">{{localize "NGH.Journey.GMHand"}} ({{gmJourneyHand.length}}/{{maxJourneyHandSize}})</h3>
+    <div class="action-toolbar">
+      <button type="button" class="action-button" data-action="draw-journey-card">{{localize "NGH.Action.DrawJourneyCard"}}</button>
+      <button type="button" class="action-button" data-action="play-blind-journey">{{localize "NGH.Action.PlayBlindJourney"}}</button>
+    </div>
+    <div class="hand-list journey-hand-list">
+      {{#if gmJourneyHand.length}}
+        {{#each gmJourneyHand}}
+        <div class="hand-card journey-hand-card">
+          <div class="hand-card__copy">
+            <strong>{{this.code}}</strong>
+            <small>{{this.label}}</small>
+          </div>
+          <div class="hand-card__actions">
+            <button type="button" class="action-button small" data-action="journey-card" data-card="{{this.code}}">{{localize "NGH.Action.Journey"}}</button>
+          </div>
+        </div>
+        {{/each}}
+      {{else}}
+        <p class="empty-note">{{localize "NGH.Journey.EmptyGMHand"}}</p>
+      {{/if}}
+    </div>
+
+    <h3 class="panel-subtitle">{{localize "NGH.Journey.PlayerJourneyHands"}}</h3>
+    <div class="journey-count-list">
+      {{#if playerJourneyCounts.length}}
+        {{#each playerJourneyCounts}}
+        <div class="journey-count-row">
+          <strong>{{this.name}}</strong>
+          <span>{{localize "NGH.Journey.CardCount" count=this.count}}</span>
+        </div>
+        {{/each}}
+      {{else}}
+        <p class="empty-note">{{localize "NGH.Journey.NoPlayers"}}</p>
+      {{/if}}
+    </div>
+
+    <h3 class="panel-subtitle">{{localize "NGH.Journey.CorruptionTitle"}} ({{totalCorruptionCards}})</h3>
+    <div class="action-toolbar">
+      <button type="button" class="action-button" data-action="apply-corruption-cards">{{localize "NGH.Action.ApplyCorruptionJourney"}}</button>
+    </div>
+    <div class="journey-count-list">
+      {{#if corruptionRecommendations.length}}
+        {{#each corruptionRecommendations}}
+        <div class="journey-count-row">
+          <strong>{{this.actorName}}</strong>
+          <span>{{localize "NGH.Journey.CorruptionEntry" corruption=this.corruption cards=this.cards}}</span>
+        </div>
+        {{/each}}
+      {{else}}
+        <p class="empty-note">{{localize "NGH.Journey.NoCorruptionCards"}}</p>
+      {{/if}}
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- ===== PHASE: DEAL ===== -->
+  {{#if isDeal}}
+  <div class="journey-panel__section">
+    <h2 class="panel-title">{{localize "NGH.Journey.Phase.deal"}}</h2>
+    {{#if requirements}}
+    <div class="journey-requirements-display">
+      <strong>{{localize "NGH.Journey.Requirements.Label"}}:</strong> {{requirements}}
+    </div>
+    {{/if}}
+    {{#if bonus}}
+    <div class="journey-bonus-display">
+      <strong>{{localize "NGH.Journey.Bonus.Label"}}:</strong> {{bonus}}
+    </div>
+    {{/if}}
+    {{#if penalty}}
+    <div class="journey-penalty-display">
+      <strong>{{localize "NGH.Journey.Penalty.Label"}}:</strong> {{penalty}}
+    </div>
+    {{/if}}
+    <p class="panel-note">{{totalCollected}} {{localize "NGH.Journey.Deal.CardsCollected"}}</p>
+    <div class="action-toolbar">
+      <button type="button" class="action-button" data-action="journey-deal" {{#unless canDeal}}disabled{{/unless}}>{{localize "NGH.Journey.Action.ShuffleAndDeal"}}</button>
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- ===== PHASE: REVEAL ===== -->
+  {{#if isReveal}}
+  <div class="journey-panel__section">
+    <h2 class="panel-title">{{localize "NGH.Journey.Phase.reveal"}}</h2>
+    {{#if requirements}}
+    <div class="journey-requirements-display">
+      <strong>{{localize "NGH.Journey.Requirements.Label"}}:</strong> {{requirements}}
+    </div>
+    {{/if}}
+    {{#if bonus}}
+    <div class="journey-bonus-display">
+      <strong>{{localize "NGH.Journey.Bonus.Label"}}:</strong> {{bonus}}
+    </div>
+    {{/if}}
+    {{#if penalty}}
+    <div class="journey-penalty-display">
+      <strong>{{localize "NGH.Journey.Penalty.Label"}}:</strong> {{penalty}}
+    </div>
+    {{/if}}
+    <p class="panel-note">{{localize "NGH.Journey.Reveal.Instructions"}}</p>
+    <div class="journey-deal-list">
+      {{#each dealtCards}}
+      <div class="journey-deal-row">
+        <strong>{{this.name}}</strong>
+        {{#if this.dealtCard}}
+          <span class="journey-card-revealed">{{this.dealtCard}}</span>
+          <em class="journey-motif">{{this.motif}}</em>
+        {{else}}
+          <span class="empty-note">{{localize "NGH.Journey.Reveal.Waiting"}}</span>
+          <button type="button" class="action-button small" data-action="journey-reveal-slot" data-slot="{{@index}}" {{#unless ../canRevealAll}}disabled{{/unless}}>{{localize "NGH.Journey.Action.RevealSlot"}}</button>
+        {{/if}}
+      </div>
+      {{/each}}
+    </div>
+    <div class="action-toolbar">
+      <button type="button" class="action-button" data-action="journey-reveal-all" {{#unless canRevealAll}}disabled{{/unless}}>{{localize "NGH.Journey.Action.RevealAll"}}</button>
+      <button type="button" class="action-button" data-action="journey-auto-resolve" {{#unless canAutoResolve}}disabled{{/unless}}>{{localize "NGH.Journey.Action.AutoResolve"}}</button>
+      <button type="button" class="action-button" data-action="journey-resolve">{{localize "NGH.Journey.Action.Resolve"}}</button>
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- ===== PHASE: RESOLVE ===== -->
+  {{#if isResolve}}
+  <div class="journey-panel__section">
+    <h2 class="panel-title">{{localize "NGH.Journey.Phase.resolve"}}</h2>
+    {{#if requirements}}
+    <div class="journey-requirements-display">
+      <strong>{{localize "NGH.Journey.Requirements.Label"}}:</strong> {{requirements}}
+    </div>
+    {{/if}}
+    {{#if bonus}}
+    <div class="journey-bonus-display">
+      <strong>{{localize "NGH.Journey.Bonus.Label"}}:</strong> {{bonus}}
+    </div>
+    {{/if}}
+    {{#if penalty}}
+    <div class="journey-penalty-display">
+      <strong>{{localize "NGH.Journey.Penalty.Label"}}:</strong> {{penalty}}
+    </div>
+    {{/if}}
+    <p class="panel-note">{{localize "NGH.Journey.Resolve.Instructions"}}</p>
+    <div class="journey-deal-list">
+      {{#each dealtCards}}
+      <div class="journey-deal-row">
+        <strong>{{this.name}}</strong>
+        {{#if this.isRevealed}}
+          <span class="journey-card-revealed">{{this.dealtCard}}</span>
+          <em class="journey-motif">{{this.motif}}</em>
+        {{else}}
+          <span class="empty-note">{{localize "NGH.Journey.Reveal.Hidden"}}</span>
+        {{/if}}
+      </div>
+      {{/each}}
+    </div>
+    {{#if requirementResult}}
+    <div class="journey-requirements-display">
+      <strong>{{localize "NGH.Journey.Resolve.Result"}}:</strong>
+      <span>{{requirementResult.status}}</span>
+      {{#if requirementResult.outcomeText}}
+      <p class="panel-note">{{requirementResult.outcomeText}}</p>
+      {{/if}}
+    </div>
+    {{/if}}
+    <div class="action-toolbar">
+      <button type="button" class="action-button" data-action="journey-finish">{{localize "NGH.Journey.Action.Finish"}}</button>
+      <button type="button" class="action-button" data-action="journey-end-mission">{{localize "NGH.Journey.Action.EndMission"}}</button>
+    </div>
+  </div>
+  {{/if}}
+
+</section>

@@ -1,0 +1,680 @@
+
+{
+  "NGH": {
+    "System": {
+      "Name": "Never Going Home",
+      "Init": "Inicjalizacja systemu Never Going Home"
+    },
+    "Actor": {
+      "SoldierRecord": "Karta żołnierza",
+      "Name": "Imię",
+      "Armor": "Pancerz",
+      "ArmorHint": "Używany zamiast Krzepy tylko przeciw atakom fizycznym, jeśli jest wyższy",
+      "Trained": "Wyszkolona",
+      "Rank": "Poziom",
+      "GMOnly": "Tylko MG",
+      "EmptyHand": "Brak kart na ręce.",
+      "EmptyJourneyHand": "Brak kart na ręce wędrówki.",
+      "Section": {
+        "Attributes": "Atrybuty",
+        "Skills": "Umiejętności",
+        "AssignedEquipment": "Przydzielony ekwipunek",
+        "ServiceRecord": "Przebieg służby",
+        "PersonalHistory": "Historia osobista",
+        "Whispers": "Ścieżki Szeptów",
+        "Corruption": "Spaczenie",
+        "Actions": "Akcje",
+        "Hand": "Ręka",
+        "JourneyHand": "Ręka wędrówki"
+      },
+      "Attribute": {
+        "Krzepa": "Krzepa",
+        "KrzepaHint": "Siła, zręczność i zdrowie fizyczne",
+        "Spryt": "Spryt",
+        "SprytHint": "Inteligencja, wiedza i zdrowie psychiczne",
+        "Hart": "Hart",
+        "HartHint": "Odwaga, siła woli i zdrowie emocjonalne"
+      },
+      "Skill": {
+        "Atletyka": "Atletyka",
+        "WalkaWrecz": "Walka Wręcz",
+        "Skradanie": "Skradanie się",
+        "Komunikacja": "Komunikacja",
+        "Wiedza": "Wiedza",
+        "Mechanika": "Mechanika",
+        "Sledztwo": "Śledztwo",
+        "WalkaDystansowa": "Walka Dystansowa",
+        "Transport": "Transport",
+        "Szepty": "Szepty",
+        "SzeptyHint": "Ścieżkowa umiejętność okultystyczna"
+      },
+      "Whisper": {
+        "PathName": "Nazwa ścieżki",
+        "Attribute": "Atrybut ścieżki",
+        "KnownSpells": "Znane Szepty",
+        "Notes": "Notatki"
+      },
+      "CorruptionLabel": "Punkty Spaczenia (0-5)",
+      "Type": {
+        "Character": "Postać",
+        "NPC": "Przeciwnik"
+      }
+    },
+    "NPC": {
+      "SheetTitle": "Arkusz Przeciwnika / NPC",
+      "Name": "Nazwa",
+      "Role": "Typ",
+      "RoleSolo": "Solo",
+      "RoleGroup": "Grupa",
+      "Initiative": "Inicjatywa",
+      "Armor": "Pancerz",
+      "Reward": "Nagroda",
+      "WeakSpot": "Słaby punkt",
+      "Weapons": "Broń",
+      "Abilities": "Umiejętności i zdolności",
+      "Description": "Opis",
+      "Section": {
+        "Stats": "Statystyki",
+        "Attributes": "Atrybuty",
+        "Details": "Szczegóły"
+      },
+      "RewardGrant": {
+        "None": "Ten przeciwnik nie ma nagrody do rozdzielenia.",
+        "NoPlayers": "Brak aktywnych graczy.",
+        "GrantTitle": "Przyznaj nagrodę",
+        "GrantPrompt": "Dobierz {count} kartę/karty dla każdego gracza? Nagroda: {reward}",
+        "ChatTitle": "Nagroda za przeciwnika",
+        "ChatLine": "{name}: +{count} karta/karty"
+      }
+    },
+    "Action": {
+      "Test": "Test",
+      "DrawCard": "Dobierz kartę",
+      "DrawJourneyCard": "Dobierz kartę wędrówki",
+      "PlayBlindJourney": "Zagraj ślepo do wędrówki",
+      "Journey": "Wędrówka",
+      "ApplyCorruptionJourney": "Rozpatrz karty spaczenia do wędrówki",
+      "OpenJourneyPanel": "Panel wędrówki",
+      "OpenCombatPanel": "Panel walki",
+      "OpenGMToolsPanel": "Narzędzia MG",
+      "Confirm": "OK",
+      "Cancel": "Anuluj",
+      "GrantReward": "Przyznaj nagrodę",
+      "CastWhisper": "Rzuć Szept",
+      "WeaponAttack": "Atak bronią",
+      "Initiative": "Inicjatywa",
+      "BurnPlusOne": "Spal +One",
+      "BurnWhisper": "Spal Szept",
+      "Heal": "Lecz",
+      "Defend": "Broń",
+      "Discard": "Odrzuć",
+      "Advance": "Rozwój",
+      "Challenge": "Wyzwanie",
+      "ElementalRitual": "Rytuał Żywiołów",
+      "OfficerShare": "Oficer — Podziel karty",
+      "AllyBlackCardCorruption": "Gwiazdy / Dzień Święty",
+      "TriggerCorruptionIncident": "Wywołaj incydent Spaczenia"
+    },
+    "Item": {
+      "Type": {
+        "Burden": "Brzemię",
+        "Equipment": "Ekwipunek",
+        "Scar": "Blizna"
+      }
+    },
+    "Card": {
+      "Suit": {
+        "Clubs": "Trefl",
+        "Diamonds": "Karo",
+        "Hearts": "Kier",
+        "Spades": "Pik",
+        "RedJoker": "Czerwony Joker",
+        "BlackJoker": "Czarny Joker"
+      },
+      "Label": {
+        "Of": "{rank} {suit}"
+      }
+    },
+    "Deck": {
+      "Name": {
+        "Shared": "Wspólna talia NGH",
+        "Discard": "Stos kart odrzuconych NGH",
+        "Hand": "Ręka NGH - {user} ({kind})",
+        "StandardHandSuffix": "Podstawowa",
+        "JourneyHandSuffix": "Wędrówka"
+      }
+    },
+    "Journey": {
+      "PanelTitle": "Panel wędrówki",
+      "GMHand": "Ręka MG do wędrówki",
+      "EmptyGMHand": "MG nie ma kart na ręce wędrówki.",
+      "PlayerJourneyHands": "Ręce wędrówki graczy",
+      "CardCount": "Kart: {count}",
+      "NoPlayers": "Brak graczy do pokazania.",
+      "CorruptionTitle": "Karty za Spaczenie",
+      "CorruptionEntry": "Spaczenie {corruption}, karty {cards}",
+      "NoCorruptionCards": "Brak rekomendowanych kart za Spaczenie.",
+      "Narrator": "Narrator",
+      "Phase": {
+        "Label": "Faza",
+        "configure": "Konfiguracja",
+        "collect": "Zbieranie",
+        "deal": "Rozdanie",
+        "reveal": "Odsłanianie",
+        "resolve": "Rozliczenie"
+      },
+      "PhaseChange": {
+        "Title": "Faza W\u0119dr\u00f3wki",
+        "Now": "Faza: {phase}"
+      },
+      "Requirements": {
+        "Label": "Wymagania",
+        "Placeholder": "np. trzy kiery, brak sz\u00f3stek..."
+      },      "Bonus": {
+        "Label": "Premia (je\u015bli spe\u0142nione)",
+        "Placeholder": "np. ka\u017cdy gracz dobiera 1 kart\u0119..."
+      },
+      "Penalty": {
+        "Label": "Kara (je\u015bli nie spe\u0142nione)",
+        "Placeholder": "np. wszystkie postacie -1 Hart..."
+      },
+      "Collect": {
+        "Instructions": "Gracze zagrywaj\u0105 karty z r\u0119ki (minimum po 1). MG mo\u017ce doda\u0107 karty w ciemno z talii."
+      },
+      "BlindCard": {
+        "MaxReached": "Dodano ju\u017c maksymaln\u0105 liczb\u0119 kart w ciemno (jedna na gracza)."
+      },
+      "Deal": {
+        "CardsCollected": "zebranych kart.",
+        "NoCards": "Brak zebranych kart do rozdania.",
+        "NoPlayers": "Brak graczy do rozdania kart.",
+        "MissingPlayerCards": "Każdy gracz musi najpierw dołożyć co najmniej jedną kartę Wędrówki: {users}"
+      },
+      "Reveal": {
+        "Instructions": "Ka\u017cdy gracz po kolei odsłania kart\u0119 i opisuje scen\u0119 zwi\u0105zan\u0105 z motywem.",
+        "Waiting": "(oczekuje na kart\u0119)",
+        "Hidden": "(karta ukryta)"
+      },
+      "Resolve": {
+        "Instructions": "Sprawdź wymagania, og\u0142o\u015b premi\u0119 lub kar\u0119. Wszystkie karty w\u0119dr\u00f3wki zostaj\u0105 odrzucone.",
+        "Result": "Wynik wymaga\u0144",
+        "NoRevealedCards": "Najpierw odsłoń karty w\u0119dr\u00f3wki.",
+        "ManualRequired": "Wymagane rozstrzygni\u0119cie r\u0119czne (tekst wymaga\u0144 nie zosta\u0142 rozpoznany).",
+        "StatusMet": "Wymagania spe\u0142nione",
+        "StatusFailed": "Wymagania niespe\u0142nione",
+        "StatusUnknown": "Wymagania niejednoznaczne"
+      },
+      "Motif": {
+        "Spades": "Wiedza \u2014 nauka, rozw\u00f3j, przezwyci\u0119\u017canie cierpienia",
+        "Clubs": "Przedmioty \u2014 pokonywanie przeszk\u00f3d, akcja, przygoda",
+        "Hearts": "Relacje \u2014 emocje i wi\u0119zi",
+        "Diamonds": "Ja\u017a\u0144 \u2014 ambicja i nadzieja",
+        "RedJoker": "Dzika karta \u2014 dowolny motyw",
+        "BlackJoker": "Dzika karta \u2014 dowolny motyw (ryzyko Spaczenia)"
+      },
+      "Action": {
+        "StartCollect": "Zacznij W\u0119dr\u00f3wk\u0119 \u2192 Zbieranie",
+        "AddBlind": "Dodaj kart\u0119 w ciemno z talii",
+        "Deal": "Przetasuj i rozdaj",
+        "ShuffleAndDeal": "Przetasuj i rozdaj karty",
+        "RevealAll": "Odsłoń wszystkie karty",
+        "RevealSlot": "Odsłoń kartę",
+        "AutoResolve": "Automatycznie rozlicz wymagania",
+        "Resolve": "Przejd\u017a do Rozliczenia",
+        "Finish": "Zako\u0144cz W\u0119dr\u00f3wk\u0119",
+        "EndMission": "Zako\u0144cz Misj\u0119"
+      }
+    },
+    "Combat": {
+      "Weapon": {
+        "FistsWeak": "Pięści (<3 Krzepa)",
+        "FistsStandard": "Pięści (3-7 Krzepa)",
+        "FistsStrong": "Pięści (>7 Krzepa)",
+        "Knife": "Nóż",
+        "Club": "Pałka",
+        "SwordBayonet": "Miecz / Bagnet",
+        "AxePick": "Siekiera / Kilof",
+        "Staff": "Kostur",
+        "Pistol": "Pistolet",
+        "Rifle": "Karabin",
+        "MachineGun": "Karabin maszynowy",
+        "Explosives": "Materiały wybuchowe",
+        "Grenade": "Granat"
+      },
+      "Effect": {
+        "BonusDamage": "+1 obrażeń",
+        "Stun": "Ogłuszenie",
+        "Aim": "Przycelowanie",
+        "Overwhelm": "Przytłoczenie",
+        "Spray": "Rozrzut",
+        "Flurry": "Seria ciosów",
+        "Critical": "Trafienie krytyczne",
+        "Shatter": "Zdruzgotanie",
+        "Shrapnel": "Odłamki"      },
+      "PanelTitle": "Panel walki",
+      "Round": "Runda",
+      "Score": "Wynik",
+      "CurrentActor": "Teraz działa",
+      "Remaining": "Pozostałe",
+      "Acted": "Działały",
+      "AllActed": "Wszyscy już działali.",
+      "NoEligibleStarter": "Brak dostępnych osób do rozpoczęcia następnej rundy.",
+      "Idle": {
+        "Description": "Brak aktywnej walki. Kliknij \"Nowa walka\" aby zacząć."
+      },
+      "Phase": {
+        "Initiative": "Inicjatywa"
+      },
+      "Action": {
+        "NewCombat": "Nowa walka",
+        "ResolveOrder": "Ustal kolejność",
+        "StartCombat": "Rozpocznij walkę",
+        "GroupAttack": "Atak grupowy",
+        "PassTurn": "Przekaz turę",
+        "EndRound": "Zakończ rundę",
+        "Reset": "Resetuj walkę"
+      },
+      "Kind": {
+        "Character": "Postać",
+        "EnemyGroup": "Grupa wrogów"
+      },
+      "GroupInfo": "liczebność {size}, atak {bonus}",
+      "Col": {
+        "Actor": "Aktor",
+        "Kind": "Typ",
+        "Card": "Karta",
+        "Score": "Wynik",
+        "Tie": "Remis",
+        "TieBreaker": "Rozstrzygająca",
+        "TieBreakerHint": "Karta rozstrzygająca"
+      },
+      "GroupAttack": {
+        "NotEnemyTurn": "Atak grupowy jest dostępny tylko w turze grupy wrogów."
+      },
+      "Ties": {
+        "Warning": "Wykryto remis — wpisz karty rozstrzygające i kliknij \"Ustal kolejność\" ponownie."
+      },
+      "EnemyGroups": {
+        "Title": "Grupy wrogów",
+        "Prompt": "Podaj grupy wrogów, jeden na linii:"
+      },
+      "ChooseFirst": {
+        "Title": "Kto działa pierwszy?",
+        "Prompt": "Osoba z najwyższą inicjatywą wybiera kto działa jako pierwszy:"
+      },
+      "ChooseNext": {
+        "Title": "Kto działa następny?",
+        "Prompt": "Wybierz kto działa następny:"
+      },
+      "ChooseStarter": {
+        "Title": "Kto zaczyna następną rundę?",
+        "Prompt": "Ostatnia osoba wybiera kto zaczyna następną rundę (nie siebie):"      }
+    },
+    "GMTools": {
+      "PanelTitle": "Narzędzia Mistrza Gry",
+      "Subtitle": "Skróty zasad i checklisty pomocne podczas prowadzenia sesji.",
+      "Section": {
+        "CorruptionOverview": "Przegląd Spaczenia",
+        "CorruptionTriggers": "Źródła Ryzyka Spaczenia",
+        "JourneyFlow": "Przebieg Wędrówki",
+        "CombatFlow": "Przebieg Walki",
+        "QuickReference": "Szybkie Odniesienia",
+        "SessionChecklist": "Checklista Sesji"
+      },
+      "Label": {
+        "Corruption": "Spaczenie"
+      },
+      "Empty": {
+        "NoCharacters": "Brak aktorów postaci."
+      },
+      "CorruptionTriggers": {
+        "BlackJoker": "Zagranie/odsłonięcie Czarnego Jokera",
+        "Burns": "Spalenie Czarnego Jokera (+One / Szept / Leczenie)",
+        "WhisperRank": "Awans Ścieżki Szeptów na poziom 3/4/5",
+        "ElementalRitual": "Rytuał Żywiołów bez kart na ręce i czarna karta z talii",
+        "StarsHolyDay": "Gwiazdy / Dzień Święty przy czarnej karcie sojusznika",
+        "Officer": "Akcja dzielenia kart przez oficera",
+        "Incident": "Incydent wywołany przez MG"
+      },
+      "JourneyFlow": {
+        "Configure": "1. Ustaw wymagania + premię/karę",
+        "Collect": "2. Zbieraj karty (gracze + karty w ciemno + karty ze Spaczenia)",
+        "Deal": "3. Przetasuj i rozdaj karty wędrówki",
+        "Reveal": "4. Odsłoń karty z narracją motywów kolorów",
+        "Resolve": "5. Rozlicz wynik wymagań i zakończ"
+      },
+      "CombatFlow": {
+        "New": "1. Nowa walka: załaduj postacie i grupy wrogów",
+        "Initiative": "2. Inicjatywa: wpisz karty, rozstrzygnij remisy",
+        "Start": "3. Start: najwyższa inicjatywa wybiera pierwszą osobę",
+        "Pass": "4. Aktywna runda: każda osoba przekazuje turę dalej",
+        "EndRound": "5. Koniec rundy: ostatnia osoba wybiera starter następnej rundy"
+      },
+      "QuickRef": {
+        "PT": "PT ataku = max(Krzepa, Pancerz)",
+        "Defense": "Obrona kartami: 1 karta blokuje 1 obrażenie",
+        "Hand": "Limit kart na ręce podstawowej: 7",
+        "Corruption34": "Spaczenie 3 -> +1 karta wędrówki; Spaczenie 4 -> +2 karty",
+        "Corruption5": "Spaczenie 5: stan ostatniej misji"
+      },
+      "SessionChecklist": {
+        "OpenPanels": "Otwórz panele Wędrówki / Walki / Narzędzi MG",
+        "ReviewCorruption": "Sprawdź poziomy Spaczenia wszystkich postaci",
+        "VerifyDeck": "Sprawdź stan talii/stosu odrzuconych i przetasowanie",
+        "CheckMission": "Ustal wymagania misji przed startem Wędrówki"
+      }
+    },
+    "Common": {
+      "None": "brak",
+      "Unknown": "nieznane"
+    },
+    "Info": {
+      "NoCorruptionJourneyCards": "Brak kart wędrówki wynikających teraz ze Spaczenia."
+    },
+    "Dialog": {
+      "InputTitle": "Wpisz wartość",
+      "ConfirmTitle": "Potwierdzenie",
+      "PostRollTitle": "Modyfikatory po rzucie"
+    },
+    "Prompt": {
+      "HealAttribute": "Który atrybut leczyć? krzepa / spryt / hart",
+      "DefenseAttribute": "Którego atrybutu bronić? krzepa / spryt / hart",
+      "IncomingDamage": "Nadchodzące obrażenia",
+      "Difficulty": "Trudność (PT)",
+      "BonusDice": "Dodatkowe kości kupione przed rzutem",
+      "WhisperAttribute": "Atrybut Szeptu: krzepa / spryt / hart",
+      "TempTrainingTest": "Użyć tymczasowego wyszkolenia w tym teście?",
+      "ChooseWeapon": "Wybierz id broni:\n{choices}",
+      "TargetKrzepa": "Docelowa Krzepa",
+      "TargetArmor": "Docelowy pancerz",
+      "TargetDefense": "Obrona celu / PT",
+      "BonusDiceAttack": "Dodatkowe kości przed atakiem",
+      "TempTrainingAttack": "Użyć tymczasowego wyszkolenia w tym ataku?",
+      "AvailableEffects": "Dostępne efekty: {effects}\nPodaj klucze efektów po przecinku lub zostaw puste.",
+      "ConfirmCorruptionJourney": "Rozpatrzyć {total} kart(y) wędrówki ze Spaczenia?\n{summary}",
+      "ChallengeParticipants": "Uczestnicy Wyzwania (ID lub nazwy oddzielone przecinkami). Dostępni: {available}",
+      "CorruptionIncident": "Powód incydentu Spaczenia (opcjonalnie)"
+    },
+    "PostRoll": {
+      "NoDice": "Brak kostek w teście. Nie można zastosować modyfikatorów post-roll.",
+      "NoBudget": "Brak budżetu post-roll (0). Przerzut i +1 są niedostępne.",
+      "BudgetLabel": "Budżet post-roll",
+      "Help": "Przerzut kosztuje 1 łącznie. +1 kosztuje 1 za każdą zaznaczoną kość.",
+      "TrimmedWarning": "Wybory +1 zostały przycięte do dostępnego budżetu post-roll.",
+      "Table": {
+        "Index": "Indeks",
+        "Roll": "Wynik",
+        "Reroll": "Przerzut"
+      }
+    },
+    "Chat": {
+      "Result": {
+        "Success": "Wynik: sukces",
+        "Failure": "Wynik: porażka"
+      },
+      "DrawCard": {
+        "Title": "Dobierz kartę",
+        "Drawn": "Dobrano: {drawn}",
+        "Hand": "Ręka: {current}/{max}"
+      },
+      "DrawJourneyCard": {
+        "Title": "Dobierz kartę wędrówki",
+        "Drawn": "Dobrano: {drawn}",
+        "Hand": "Ręka wędrówki: {current}/{max}"
+      },
+      "DiscardCard": {
+        "Title": "Odrzuć kartę",
+        "Discarded": "Odrzucono: {card}",
+        "HandLeft": "Kart na ręce: {count}"
+      },
+      "Journey": {
+        "Title": "Wędrówka",
+        "RevealTitle": "Odsłonięcie kart Wędrówki",
+        "RevealedCard": "{user}: {card}",
+        "BJGMSlotTitle": "Czarny Joker \u2014 Ślepy slot",
+        "BJGMSlotWarning": "Czarny Joker pojawił się w ślepym slocie wędrówki. Przydziel ryzyko Spaczenia odpowiedniemu graczowi ręcznie.",
+        "BJPlayerSlotAffected": "Czarny Joker w slocie wędrówki gracza {user} \u2014 ryzyko Spaczenia:",
+        "BJCorruptionApplied": "Spaczenie zastosowane dla {name}.",
+        "BJNoActorWarning": "Nie znaleziono powiązanej postaci dla {user} \u2014 zastosuj Spaczenie +1 ręcznie.",
+        "ResolveTitle": "Rozliczenie Wędrówki",
+        "ResolveStatus": "Status: {status}",
+        "ResolveOutcome": "Efekt: {outcome}",
+        "Source": "Źródło: {source}",
+        "Played": "Zagrano: {card}",
+        "DrewBlind": "Dobrano w ciemno: {card}",
+        "HandLeft": "Kart na r\u0119ce w\u0119dr\u00f3wki: {count}",
+        "BlindCard": "Karta w ciemno",
+        "BlindAdded": "Dobrano kart\u0119 w ciemno: {card}",
+        "DealTitle": "Rozdano karty W\u0119dr\u00f3wki",
+        "DealtCard": "{user}: {card}",
+        "FinishTitle": "W\u0119dr\u00f3wka zako\u0144czona",
+        "Finished": "Faza w\u0119dr\u00f3wki zako\u0144czona. Karty rozliczone.",
+        "EndMissionTitle": "Misja Zako\u0144czona",
+        "EndMissionAttributes": "Wszystkie atrybuty postaci przywr\u00f3cone.",
+        "EndMissionReshuffle": "Przetasowano {count} kart do talii.",
+        "Corruption5Title": "Spaczenie 5 \u2014 Ostatnia misja",
+        "Corruption5Warning": "Nast\u0119puj\u0105ce postacie osi\u0105gn\u0119\u0142y Spaczenie 5. To by\u0142a ich ostatnia misja \u2014 musz\u0105 opu\u015bci\u0107 oddzia\u0142.",
+        "Corruption5Actor": "\u2022 {name}"
+      },
+      "Initiative": {
+        "Title": "Inicjatywa",
+        "Card": "Karta: {card}",
+        "Score": "Wynik: {score}",
+        "Kept": "Karta pozostaje na ręce.",
+        "Resolved": "Karta została rozliczona z talii lub po przetasowaniu."
+      },
+      "BurnPlusOne": {
+        "Title": "Spal kartę za +One"
+      },
+      "BurnWhisper": {
+        "Title": "Spal kartę za Szept"
+      },
+      "WhisperCast": {
+        "Title": "Rzucenie Szeptu",
+        "Path": "Ścieżka: {path}",
+        "Spell": "Czar: {spell}",
+        "CostCard": "Opłacono koszt: {card}",
+        "BurnBlack": "Spalono Czarnego Jokera \u2014 ryzyko Spaczenia!",
+        "Failed": "Wynik: niepowodzenie \u2014 rozważ dodatkowe poświęcenie (zależne od ścieżki)."
+      },
+      "BurnCard": {
+        "Burned": "Spalone: {cards}",
+        "HandRemaining": "Pozostało kart na ręce: {count}"
+      },
+      "Heal": {
+        "Title": "Leczenie atrybutu",
+        "Burned": "Spalono: {card}",
+        "Recovered": "Odzyskano {attribute} do {current}/{max}"
+      },
+      "Defend": {
+        "Title": "Obrona kartą",
+        "Card": "Karta: {card}",
+        "Attribute": "Atrybut: {attribute}",
+        "Incoming": "Nadchodzące: {incoming}",
+        "Prevented": "Zablokowano: {prevented}",
+        "Applied": "Przyjęto: {applied}",
+        "Current": "Stan: {current}/{max}"
+      },
+      "SkillTest": {
+        "Title": "Test umiejętności",
+        "Skill": "Umiejętność: {skill}",
+        "Attribute": "Atrybut: {attribute}",
+        "RollsBefore": "Rzuty przed post-roll: {rolls}",
+        "PostChoices": "Wybory post-roll: przerzut [{reroll}], +1 [{increase}]",
+        "RollsFinal": "Rzuty końcowe: {rolls}",
+        "Successes": "Sukcesy: {successes}/{difficulty}"
+      },
+      "Challenge": {
+        "Title": "Wyzwanie grupowe",
+        "Skill": "Umiejętność: {skill}",
+        "Difficulty": "PT: {difficulty}",
+        "Total": "Suma sukcesów: {successes}",
+        "Participant": "{participant}: {successes} sukces(ów) [{rolls}]"
+      },
+      "WeaponAttack": {
+        "Title": "Atak bronią",
+        "Weapon": "Broń: {weapon}",
+        "RollsBefore": "Rzuty przed post-roll: {rolls}",
+        "PostChoices": "Wybory post-roll: przerzut [{reroll}], +1 [{increase}]",
+        "RollsFinal": "Rzuty końcowe: {rolls}",
+        "Successes": "Sukcesy: {successes}",
+        "Hit": "Trafienie za {damage} obrażeń.",
+        "Miss": "Pudło.",
+        "Effects": "Efekty: {effects}",
+        "EffectsNone": "Efekty: brak"
+      },
+      "ElementalRitual": {
+        "Title": "Rytuał Żywiołów",
+        "Drew": "Dobrano z talii: {card}",
+        "Paid": "Odrzucono z ręki: {card}",
+        "NoDraw": "Brak kart w talii.",
+        "Black": "Czarna karta - wywołano Ryzyko Spaczenia.",
+        "Red": "Czerwona karta - brak ryzyka Spaczenia.",
+        "FromHand": "Koszt opłacono kartą z ręki."
+      },
+      "OfficerShare": {
+        "Title": "Oficer - Rozdzielono karty",
+        "Card": "{user}: {card}",
+        "NoneDrawn": "Nie udało się dobrać kart z talii."
+      },
+      "CorruptionJourney": {
+        "Title": "Karty wędrówki ze Spaczenia",
+        "Total": "Rozpatrzone karty: {total}",
+        "Drawn": "Dobrane: {cards}",
+        "Entry": "{actor}: Spaczenie {corruption}, kart {cards}"
+      },
+      "CorruptionRisk": {
+        "Title": "Ryzyko Spaczenia",
+        "Reason": "Powód: {reason}",
+        "JokerSkipped": "Joker odrzucony i przetasowany: {joker}",
+        "Card": "Dobrana karta: {card}",
+        "Black": "Czarna karta — Spaczenie +1",
+        "Red": "Czerwona karta — brak Spaczenia."
+      },
+      "Combat": {
+        "StartTitle": "Walka rozpoczęta",
+        "Round": "Runda {round}",
+        "FirstActor": "Pierwszy działa: {actor}",
+        "PassTitle": "Inicjatywa przekazana",
+        "NextActor": "Następny: {actor}",
+        "NewRoundTitle": "Nowa runda",
+        "GroupAttack": {
+          "Title": "Atak grupy wrogów",
+          "Group": "Grupa: {group}",
+          "Dice": "Kości: {dice}",
+          "Rolls": "Rzuty: {rolls}",
+          "Successes": "Sukcesy: {successes}"
+        }
+      },
+      "Advancement": {
+        "Title": "Rozw\u00f3j",
+        "Attribute": "{attr}: {from} \u2192 {to}",
+        "Skill": "{skill}: poziom {from} \u2192 {to}",
+        "NewSkill": "Nowa umiej\u0119tno\u015b\u0107: {skill} (poziom {rank})",
+        "Whisper": "Szept {path}: poziom {from} \u2192 {to}",
+        "Spent": "Wydane karty: {cards}",
+        "SameColor": "Ten sam kolor \u2014 zachowano 1 kart\u0119.",
+        "FacesBonus": "Same figury/asy \u2014 efekt +1!"      }
+    },
+    "CorruptionRisk": {
+      "Reason": {
+        "BlackJokerInitiative": "Czarny Joker \u2014 Inicjatywa",
+        "BlackJokerJourney": "Czarny Joker \u2014 W\u0119dr\u00f3wka",
+        "BlackJokerBurnPlusOne": "Czarny Joker \u2014 Spalenie za +One",
+        "BlackJokerBurnWhisper": "Czarny Joker \u2014 Spalenie za Szept",
+        "BlackJokerBurnHeal": "Czarny Joker \u2014 Spalenie na Leczenie",
+        "ElementalRitual": "Rytuał Żywiołów \u2014 brak kart na ręce",
+        "StarsHolyDay": "Gwiazdy / Dzień Święty \u2014 czarna karta sojusznika",
+        "ManualIncident": "Incydent MG powodujący Spaczenie",
+        "ManualIncidentDetail": "Incydent: {detail}",
+        "OfficerShare": "Oficer \u2014 dzielenie kart z oddziałem",
+        "WhisperAdvancement": "Awans Ścieżki Szeptów {path} do poziomu {rank}",
+        "WhisperBurn": "Szept \u2014 spalono Czarnego Jokera ({path})"
+      }
+    },
+    "Whisper": {
+      "Cast": {
+        "NotLearned": "Ta ścieżka Szeptów nie została jeszcze nauczona.",
+        "SpellPrompt": "Nazwa czaru ścieżki \"{path}\" (zostaw puste, aby pominąć):",
+        "CostTitle": "Opłać koszt Szeptu",
+        "CostHint": "Wybierz 1 kartę z ręki do spalenia jako koszt rzucenia czaru ze ścieżki \"{path}\"."
+      }
+    },
+    "Officer": {
+      "NoActivePlayers": "Brak aktywnych graczy.",
+      "DialogTitle": "Oficer \u2014 Podziel 4 karty",
+      "DialogHint": "Zaryzykujesz Spaczenie, następnie dobierzesz 4 karty z talii i przydzielisz każdą graczowi.",
+      "CardSlot": "Karta {n}",
+      "CardPrompt": "Odbiorca karty {n} ({players})"
+    },
+    "ElementalRitual": {
+      "SelectCostCard": "Wybierz kartę do opłacenia kosztu Rytuału Żywiołów."
+    },
+    "Advancement": {
+      "NoCardsInHand": "Brak kart na r\u0119ce.",
+      "AtMaximum": "Ju\u017c na maksimum.",
+      "Select": "Wybierz",
+      "Card": "Karta",
+      "AdvanceAttribute": "Podnie\u015b atrybut",
+      "AdvanceSkill": "Podnie\u015b umiej\u0119tno\u015b\u0107",
+      "AcquireSkill": "Kup now\u0105 umiej\u0119tno\u015b\u0107",
+      "AdvanceWhisper": "Podnie\u015b \u015acie\u017ck\u0119 Szept\u00f3w",
+      "AttributeHint": "Podnie\u015b {attr}: {current} \u2192 {next}. Koszt: {cost} czerwonych kart. Ten sam kolor: zachowaj 1. Same figury/asy: efekt +1.",
+      "SkillDieHint": "Podnie\u015b {skill}: poziom {current} \u2192 {next}. Koszt: {cost} kart.",
+      "NewSkillHint": "Kup {skill}. Koszt: {cost} kart.",
+      "WhisperHint": "Podnie\u015b Szept {path}: poziom {current} \u2192 {next}. Koszt: {cost} kart.",
+      "Error": {
+        "AttributeRedOnly": "Podniesienie atrybutu wymaga wy\u0142\u0105cznie czerwonych kart (\u2665/\u2666)."
+      }
+    },
+    "Error": {
+      "ActionFailed": "Akcja nie powiodła się",
+      "ApiUnavailable": "API NGH nie jest dostępne",
+      "MissingActiveUser": "Brak aktywnego użytkownika",
+      "CardCodeRequired": "Akcja karty wymaga kodu karty",
+      "SkillKeyRequired": "Akcja testu wymaga klucza umiejętności",
+      "CardNotInHand": "Karta {card} nie znajduje się na ręce użytkownika",
+      "CardNotInJourneyHand": "Karta {card} nie znajduje się na ręce wędrówki użytkownika",
+      "MissingJourneyUserId": "Brak userId dla użycia karty podróży",
+      "JourneyCardRequired": "Do podróży trzeba wybrać kartę z ręki",
+      "GMOnlyJourneyPanel": "Tylko MG może otworzyć panel wędrówki",
+      "GMOnlyCombatPanel": "Tylko MG może otworzyć panel walki",
+      "GMOnlyGMToolsPanel": "Tylko MG może otworzyć Narzędzia MG",
+      "MissingInitiativeUserId": "Brak userId dla inicjatywy",
+      "InitiativeCardRequired": "Do inicjatywy trzeba wybrać kartę z ręki",
+      "MissingBurnUserId": "Brak userId dla spalenia kart",
+      "BurnCardRequired": "Musisz spalić co najmniej jedną kartę",
+      "RitualCardRequired": "Wybierz kartę z ręki do Rytuału Żywiołów.",
+      "AdvancementCardsRequired": "Awans wymaga {required} kart",
+      "WhisperAttributeOverrideRequired": "Testy Szeptów wymagają jawnego attributeOverride",
+      "ModifierBudgetExceededBeforeRoll": "Przekroczono budżet modyfikatorów przed rzutem",
+      "ModifierBudgetExceededReroll": "Przekroczono budżet modyfikatorów przy przerzucie",
+      "ModifierBudgetExceededIncrease": "Przekroczono budżet modyfikatorów przy zwiększaniu kostek",
+      "FoundryCardsUnavailable": "Kolekcja kart Foundry nie jest dostępna",
+      "GMOnlyDeckManagement": "Tylko MG może zarządzać wspólnymi stosami kart Foundry",
+      "ManageOwnHandOnly": "Możesz zarządzać tylko własną ręką",
+      "DeckNotInitialized": "Stosy kart NGH nie są jeszcze zainicjalizowane. Pozwól MG najpierw wczytać świat.",
+      "MissingDrawUserId": "Brak userId dla dobierania",
+      "MissingDiscardUserId": "Brak userId dla odrzucania",
+      "UserHandMissing": "Ręka użytkownika nie istnieje",
+      "MissingReturnUserId": "Brak userId dla zwrotu kart do talii",
+      "UnknownWeaponProfile": "Nieznany profil broni: {weaponId}",
+      "UnsupportedWeaponEffect": "Broń {weaponId} nie obsługuje efektu {effect}",
+      "WeaponEffectsExceedSurplus": "Wybrane efekty broni przekraczają dostępny nadmiar sukcesów"
+    }
+  },
+  "TYPES": {
+    "Actor": {
+      "character": "NGH.Actor.Type.Character"
+    },
+    "Item": {
+      "burden": "NGH.Item.Type.Burden",
+      "equipment": "NGH.Item.Type.Equipment",
+      "scar": "NGH.Item.Type.Scar"
+    }
+  },
+    "Reveal": {
+          "InvalidSlot": "Nieprawidłowy indeks miejsca.",
+          "AlreadyRevealed": "Ta karta jest już odsłonięta."
+    }
+}

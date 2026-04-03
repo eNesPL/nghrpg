@@ -1,0 +1,78 @@
+<form class="{{cssClass}} ngh npc-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <h1 class="sheet-title">{{localize "NGH.NPC.SheetTitle"}}</h1>
+    <div class="identity-row">
+      <span>{{localize "NGH.NPC.Name"}}</span>
+      <input type="text" name="name" value="{{actor.name}}" />
+    </div>
+  </header>
+
+  <section class="record-columns">
+    <div class="record-panel">
+      <h2 class="panel-title">{{localize "NGH.NPC.Section.Stats"}}</h2>
+      <label class="field-inline">
+        <span>{{localize "NGH.NPC.Role"}}</span>
+        <input type="text" name="system.role" value="{{system.role}}" />
+      </label>
+      <label class="field-inline">
+        <span>{{localize "NGH.NPC.Initiative"}}</span>
+        <input type="text" name="system.initiative" value="{{system.initiative}}" />
+      </label>
+      <label class="field-inline">
+        <span>{{localize "NGH.NPC.Armor"}}</span>
+        <input type="text" name="system.armor" value="{{system.armor}}" />
+      </label>
+      <label class="field-inline">
+        <span>{{localize "NGH.NPC.Reward"}}</span>
+        <input type="text" name="system.reward" value="{{system.reward}}" />
+        {{#if isGM}}<button type="button" class="action-button action-button--sm" data-action="grant-reward">{{localize "NGH.Action.GrantReward"}}</button>{{/if}}
+      </label>
+
+      <h2 class="panel-title">{{localize "NGH.NPC.Section.Attributes"}}</h2>
+      <label class="field-inline">
+        <span>{{localize "NGH.Actor.Attribute.Krzepa"}}</span>
+        <div class="attribute-pair">
+          <input type="number" min="0" step="1" name="system.attributes.krzepa.value" value="{{system.attributes.krzepa.value}}" />
+          <span>/</span>
+          <input type="number" min="0" step="1" name="system.attributes.krzepa.max" value="{{system.attributes.krzepa.max}}" />
+        </div>
+      </label>
+      <label class="field-inline">
+        <span>{{localize "NGH.Actor.Attribute.Spryt"}}</span>
+        <div class="attribute-pair">
+          <input type="number" min="0" step="1" name="system.attributes.spryt.value" value="{{system.attributes.spryt.value}}" />
+          <span>/</span>
+          <input type="number" min="0" step="1" name="system.attributes.spryt.max" value="{{system.attributes.spryt.max}}" />
+        </div>
+      </label>
+      <label class="field-inline">
+        <span>{{localize "NGH.Actor.Attribute.Hart"}}</span>
+        <div class="attribute-pair">
+          <input type="number" min="0" step="1" name="system.attributes.hart.value" value="{{system.attributes.hart.value}}" />
+          <span>/</span>
+          <input type="number" min="0" step="1" name="system.attributes.hart.max" value="{{system.attributes.hart.max}}" />
+        </div>
+      </label>
+    </div>
+
+    <div class="record-panel training-panel">
+      <h2 class="panel-title">{{localize "NGH.NPC.Section.Details"}}</h2>
+      <label class="text-block compact">
+        <span>{{localize "NGH.NPC.Weapons"}}</span>
+        <textarea name="system.weapons" rows="5">{{system.weapons}}</textarea>
+      </label>
+      <label class="text-block compact">
+        <span>{{localize "NGH.NPC.Abilities"}}</span>
+        <textarea name="system.abilities" rows="8">{{system.abilities}}</textarea>
+      </label>
+      <label class="text-block compact">
+        <span>{{localize "NGH.NPC.WeakSpot"}}</span>
+        <textarea name="system.weakSpot" rows="3">{{system.weakSpot}}</textarea>
+      </label>
+      <label class="text-block compact">
+        <span>{{localize "NGH.NPC.Description"}}</span>
+        <textarea name="system.description" rows="7">{{system.description}}</textarea>
+      </label>
+    </div>
+  </section>
+</form>
