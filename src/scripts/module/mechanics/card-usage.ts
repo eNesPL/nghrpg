@@ -151,14 +151,6 @@ const assertCardsInHand = (cards: string[], userId: string): void => {
   }
 };
 
-const assertCardsInJourneyHand = (cards: string[], userId: string): void => {
-  for (const card of cards) {
-    if (!hasCardInHand(card, userId, "journey")) {
-      throw new Error(tf("NGH.Error.CardNotInJourneyHand", { card }, `Card ${card} is not in the user's journey hand`));
-    }
-  }
-};
-
 export const drawForCorruptionRisk = async (): Promise<NGHCorruptionRiskResult> => {
   const jokersSkipped: string[] = [];
 
@@ -205,7 +197,7 @@ export const burnForElementalRitual = async (
       source: "hand",
       card,
       isBlack: isCardBlack(card),
-      triggersCorruptionRisk: false
+      triggersCorruptionRisk: card === "BJ"
     };
   }
 
@@ -230,28 +222,16 @@ export const useJourneyCard = async (
 ): Promise<NGHJourneyCardResult> => {
   if (!userId) throw new Error(t("NGH.Error.MissingJourneyUserId", "Missing userId for journey card use"));
 
-  const hand = getUserHand(userId, "journey");
+  const hand = getUserHand(userId);
   if (hand.length > 0) {
     if (!card) throw new Error(t("NGH.Error.JourneyCardRequired", "A card from hand must be selected for journey use"));
-    assertCardsInJourneyHand([card], userId);
+    assertCardsInHand([card], userId);
 
-    if (isJoker(card)) {
-      const result = await returnCardsFromHandToDeck([card], userId, "journey");
-      return {
-        userId,
-        source: "hand",
-        hidden: false,
-        playedCards: [card],
-        hand: result.hand,
-        triggersCorruptionRisk: card === "BJ"
-      };
-    }
-
-    const result = await discardFromHand([card], userId, "journey");
+    const result = await discardFromHand([card], userId);
     return {
       userId,
       source: "hand",
-      hidden: false,
+      hidden: true,
       playedCards: [card],
       hand: result.hand,
       triggersCorruptionRisk: false
@@ -260,16 +240,13 @@ export const useJourneyCard = async (
 
   const topDeck = await drawTopDeckCard(true);
   const drawnCard = topDeck.drawn ?? null;
-  if (drawnCard && isJoker(drawnCard)) {
-    await returnJokerAfterCorruptionDraw(drawnCard);
-  }
   return {
     userId,
     source: "top-deck",
     hidden: true,
     playedCards: drawnCard ? [drawnCard] : [],
     hand: [],
-    triggersCorruptionRisk: drawnCard === "BJ"
+    triggersCorruptionRisk: false
   };
 };
 
@@ -444,6 +421,7 @@ export interface NGHAdvancementSpendResult {
   effectBonus: number;
   sameColorDiscount: boolean;
   keptCard: string | null;
+  triggersCorruptionRisk: boolean;
 }
 
 export const spendCardsForAdvancement = async (
@@ -451,7 +429,8 @@ export const spendCardsForAdvancement = async (
   type: NGHAdvancementType,
   currentRank: number,
   newSkillsAlreadyBought = 0,
-  userId: string = game.user?.id ?? ""
+  userId: string = game.user?.id ?? "",
+  chosenKeptCard?: string
 ): Promise<NGHAdvancementSpendResult> => {
   if (!userId) throw new Error(t("NGH.Error.MissingBurnUserId", "Missing userId for card burn"));
 
@@ -463,19 +442,41 @@ export const spendCardsForAdvancement = async (
     throw new Error(tf("NGH.Error.AdvancementCardsRequired", { required: cost.cardsNeeded }, `Advancement requires ${cost.cardsNeeded} cards`));
   }
 
+  // If same-color discount applies and user chose which card to keep, reorder so it's at the kept position
+  if (cost.sameColorDiscount && chosenKeptCard) {
+    const keepIndex = cards.slice(0, cost.cardsNeeded).indexOf(chosenKeptCard);
+    if (keepIndex !== -1 && keepIndex !== cost.cardsNeeded - 1) {
+      const reordered = [...cards];
+      [reordered[keepIndex], reordered[cost.cardsNeeded - 1]] = [reordered[cost.cardsNeeded - 1], reordered[keepIndex]];
+      cards = reordered;
+    }
+  }
+
   assertCardsInHand(cards.slice(0, cost.cardsNeeded), userId);
 
   const toSpend = cards.slice(0, cost.finalCost);
   const keptCard = cost.sameColorDiscount ? cards[cost.cardsNeeded - 1] : null;
 
-  const result = await discardFromHand(toSpend, userId);
+  const jokerCards = toSpend.filter((card) => isJoker(card));
+  const normalCards = toSpend.filter((card) => !isJoker(card));
+  let handAfterSpend = getUserHand(userId);
+
+  if (normalCards.length > 0) {
+    const result = await discardFromHand(normalCards, userId);
+    handAfterSpend = result.hand;
+  }
+  if (jokerCards.length > 0) {
+    const result = await returnCardsFromHandToDeck(jokerCards, userId);
+    handAfterSpend = result.hand;
+  }
 
   return {
     cards: toSpend,
-    hand: result.hand,
+    hand: handAfterSpend,
     amount: toSpend.length,
     effectBonus: cost.effectBonus,
     sameColorDiscount: cost.sameColorDiscount,
-    keptCard
+    keptCard,
+    triggersCorruptionRisk: toSpend.includes("BJ")
   };
 };

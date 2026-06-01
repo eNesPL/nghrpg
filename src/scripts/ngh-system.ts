@@ -46,6 +46,7 @@ import {
   registerSharedDeckSettings,
   resetSharedDeck,
   reshuffleDiscardsIntoDrawPile,
+  returnDiscardedJokersToDeck,
   returnCardsFromHandToDeck,
   returnJourneyCardsToDeck,
   shuffleAndDealJourneyCards
@@ -93,6 +94,7 @@ type NGHGameApi = {
       discardJourney: (cards: string[], userId?: string) => Promise<any>;
       returnToDeck: typeof returnCardsFromHandToDeck;
       returnJourneyToDeck: typeof returnJourneyCardsToDeck;
+      returnDiscardedJokersToDeck: typeof returnDiscardedJokersToDeck;
       reset: typeof resetSharedDeck;
       reshuffle: typeof reshuffleDiscardsIntoDrawPile;
       maxHandSize: typeof getMaxHandSize;
@@ -193,15 +195,32 @@ Hooks.once("init", () => {
     }
   } as any;
 
-  (Actors as any).unregisterSheet("core", ActorSheet);
-  (Actors as any).registerSheet(NGH_SYSTEM_ID, NGHActorSheet, {
-    types: ["character"],
-    makeDefault: true,
-  });
-  (Actors as any).registerSheet(NGH_SYSTEM_ID, NGHNPCSheet, {
-    types: ["npc"],
-    makeDefault: true,
-  });
+  const DocumentSheetConfig: any =
+    (foundry as any)?.applications?.apps?.DocumentSheetConfig ??
+    (globalThis as any).DocumentSheetConfig;
+
+  if (DocumentSheetConfig?.unregisterSheet) {
+    DocumentSheetConfig.unregisterSheet(Actor as any, "core", (foundry as any).appv1?.sheets?.ActorSheet ?? (globalThis as any).ActorSheet);
+    DocumentSheetConfig.registerSheet(Actor as any, NGH_SYSTEM_ID, NGHActorSheet, {
+      types: ["character"],
+      makeDefault: true,
+    });
+    DocumentSheetConfig.registerSheet(Actor as any, NGH_SYSTEM_ID, NGHNPCSheet, {
+      types: ["npc"],
+      makeDefault: true,
+    });
+  } else {
+    // v12 fallback
+    (Actors as any).unregisterSheet("core", (globalThis as any).ActorSheet);
+    (Actors as any).registerSheet(NGH_SYSTEM_ID, NGHActorSheet, {
+      types: ["character"],
+      makeDefault: true,
+    });
+    (Actors as any).registerSheet(NGH_SYSTEM_ID, NGHNPCSheet, {
+      types: ["npc"],
+      makeDefault: true,
+    });
+  }
 
   const localizedWeapons = Object.fromEntries(
     Object.keys(NGH_WEAPON_PROFILES).map((weaponId) => [weaponId, getWeaponProfile(weaponId)])
@@ -243,6 +262,7 @@ Hooks.once("init", () => {
         discardJourney: (cards: string[], userId?: string) => discardFromHand(cards, userId, "journey"),
         returnToDeck: returnCardsFromHandToDeck,
         returnJourneyToDeck: returnJourneyCardsToDeck,
+        returnDiscardedJokersToDeck,
         reset: resetSharedDeck,
         reshuffle: reshuffleDiscardsIntoDrawPile,
         maxHandSize: getMaxHandSize,

@@ -208,12 +208,12 @@
       <h2 class="panel-title">{{localize "NGH.Actor.Section.Actions"}}</h2>
       <div class="action-toolbar sheet-ops">
         <button type="button" class="action-button" data-action="draw-card">{{localize "NGH.Action.DrawCard"}}</button>
-        <button type="button" class="action-button" data-action="draw-journey-card">{{localize "NGH.Action.DrawJourneyCard"}}</button>
-        <button type="button" class="action-button" data-action="play-blind-journey">{{localize "NGH.Action.PlayBlindJourney"}}</button>
+        <button type="button" class="action-button" data-action="play-blind-journey" {{#unless canPlayBlindJourney}}disabled{{/unless}}>{{localize "NGH.Action.PlayBlindJourney"}}</button>
         <button type="button" class="action-button" data-action="weapon-attack">{{localize "NGH.Action.WeaponAttack"}}</button>
         <button type="button" class="action-button" data-action="elemental-ritual">{{localize "NGH.Action.ElementalRitual"}}</button>
         <button type="button" class="action-button" data-action="officer-share">{{localize "NGH.Action.OfficerShare"}}</button>
         <button type="button" class="action-button" data-action="ally-black-card-corruption">{{localize "NGH.Action.AllyBlackCardCorruption"}}</button>
+        <button type="button" class="action-button" data-action="grove-corruption">{{localize "NGH.Action.GroveCorruption"}}</button>
         {{#if canTriggerCorruptionIncident}}
         <button type="button" class="action-button" data-action="gm-corruption-incident">{{localize "NGH.Action.TriggerCorruptionIncident"}}</button>
         {{/if}}
@@ -223,7 +223,7 @@
       <div class="hand-list">
         {{#if playerHand.length}}
           {{#each playerHand}}
-          <div class="hand-card">
+          <div class="hand-card suit-{{this.suitColor}}">
             <div class="hand-card__copy">
               <strong>{{this.code}}</strong>
               <small>{{this.label}}</small>
@@ -234,6 +234,7 @@
               <button type="button" class="action-button small" data-action="burn-whisper" data-card="{{this.code}}">{{localize "NGH.Action.BurnWhisper"}}</button>
               <button type="button" class="action-button small" data-action="heal-card" data-card="{{this.code}}">{{localize "NGH.Action.Heal"}}</button>
               <button type="button" class="action-button small" data-action="defend-card" data-card="{{this.code}}">{{localize "NGH.Action.Defend"}}</button>
+              <button type="button" class="action-button small" data-action="journey-card" data-card="{{this.code}}" {{#unless ../canPlayJourneyCards}}disabled{{/unless}}>{{localize "NGH.Action.Journey"}}</button>
               <button type="button" class="action-button small" data-action="discard-card" data-card="{{this.code}}">{{localize "NGH.Action.Discard"}}</button>
             </div>
           </div>
@@ -249,11 +250,8 @@
           {{#each journeyHand}}
           <div class="hand-card journey-hand-card">
             <div class="hand-card__copy">
-              <strong>{{this.code}}</strong>
-              <small>{{this.label}}</small>
-            </div>
-            <div class="hand-card__actions">
-              <button type="button" class="action-button small" data-action="journey-card" data-card="{{this.code}}">{{localize "NGH.Action.Journey"}}</button>
+              <strong>{{localize "NGH.Journey.Reveal.Hidden"}}</strong>
+              <small>{{localize "NGH.Actor.JourneyDealtHint"}}</small>
             </div>
           </div>
           {{/each}}
@@ -264,4 +262,3 @@
     </div>
   </section>
 </form>
-

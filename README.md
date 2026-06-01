@@ -4,23 +4,23 @@ Baseline project scaffold for a Foundry VTT game system implementation for Never
 
 ## Scripts
 
-- `npm run build`: Compile TypeScript and copy static assets into the system root folder used by Foundry.
-- `npm run sync:foundry`: Build the system and sync the Foundry runtime files to `C:\Users\kliza\AppData\Local\FoundryVTT\Data\systems\nghrpg`.
+- `npm run build`: Compile TypeScript and copy static assets into `dist/`.
+- `npm run sync:foundry`: Build the system and sync the `dist/` runtime files to `C:\Users\kliza\AppData\Local\FoundryVTT\Data\systems\nghrpg`.
 - `npm run watch`: Rebuild TypeScript on changes.
 
 ## Local usage in Foundry
 
 1. Run `npm run build`.
-2. Keep this workspace directly in your Foundry `Data/systems/nghrpg` directory, or symlink this workspace there.
-3. Launch Foundry and the system should be detected from the local `system.json` manifest.
+2. Point Foundry at the generated `dist/` folder, or run `npm run sync:foundry` to copy `dist/` into your Foundry data directory.
+3. Launch Foundry and the system should be detected from the generated `system.json` manifest.
 
 If your workspace is outside the Foundry data directory, use `npm run sync:foundry` to copy the runtime files into the installed Foundry system folder.
 
 ## Current runtime layout
 
-- Runtime manifest generated at `system.json`
-- Runtime entrypoint generated at `scripts/ngh-system.js`
-- Runtime assets generated at `templates/`, `styles/`, and `lang/`
+- Runtime manifest generated at `dist/system.json`
+- Runtime entrypoint generated at `dist/scripts/ngh-system.js`
+- Runtime assets generated at `dist/templates/`, `dist/styles/`, and `dist/lang/`
 
 ## Source layout
 

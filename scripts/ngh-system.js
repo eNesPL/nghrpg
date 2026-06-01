@@ -4,7 +4,7 @@ import { applyAttributeDamage, getActorDefenseValue, healAttributeDamage, isActo
 import { computeAttackPT, getNextRoundStarterOptions, getWeaponProfile, NGH_WEAPON_PROFILES, resolveTieBreaker, resolveInitiativeOrder, resolveWeaponAttack } from "./module/mechanics/combat.js";
 import { executeSkillTest, getSkillAttribute, rollChallenge } from "./module/mechanics/skill-tests.js";
 import { burnCardForPlusOne, burnCardForWhisper, burnCardsForHealing, burnForElementalRitual, drawForCorruptionRisk, getAdvancementCardCost, parseCard, spendCardsForAdvancement, useInitiativeCard, useJourneyCard } from "./module/mechanics/card-usage.js";
-import { discardFromHand, drawFromSharedDeck, drawJourneyHand, drawTopDeckCard, drawTopDeckCards, getJourneyHand, getMaxHandSize, getMaxJourneyHandSize, getSharedDeckState, getUserHand, hasCardInHand, initializeSharedDeck, isJoker, registerSharedDeckSettings, resetSharedDeck, reshuffleDiscardsIntoDrawPile, returnCardsFromHandToDeck, returnJourneyCardsToDeck, shuffleAndDealJourneyCards } from "./module/mechanics/shared-deck.js";
+import { discardFromHand, drawFromSharedDeck, drawJourneyHand, drawTopDeckCard, drawTopDeckCards, getJourneyHand, getMaxHandSize, getMaxJourneyHandSize, getSharedDeckState, getUserHand, hasCardInHand, initializeSharedDeck, isJoker, registerSharedDeckSettings, resetSharedDeck, reshuffleDiscardsIntoDrawPile, returnDiscardedJokersToDeck, returnCardsFromHandToDeck, returnJourneyCardsToDeck, shuffleAndDealJourneyCards } from "./module/mechanics/shared-deck.js";
 import { openJourneyPanel, registerJourneyPanelSettings, handleJourneySocketMessage } from "./apps/journey-panel.js";
 import { openCombatPanel, registerCombatPanelSettings } from "./apps/combat-panel.js";
 import { openGMToolsPanel } from "./apps/gm-tools-panel.js";
@@ -82,15 +82,31 @@ Hooks.once("init", () => {
             value: ["corruption", "armor"]
         }
     };
-    Actors.unregisterSheet("core", ActorSheet);
-    Actors.registerSheet(NGH_SYSTEM_ID, NGHActorSheet, {
-        types: ["character"],
-        makeDefault: true,
-    });
-    Actors.registerSheet(NGH_SYSTEM_ID, NGHNPCSheet, {
-        types: ["npc"],
-        makeDefault: true,
-    });
+    const DocumentSheetConfig = foundry?.applications?.apps?.DocumentSheetConfig ??
+        globalThis.DocumentSheetConfig;
+    if (DocumentSheetConfig?.unregisterSheet) {
+        DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1?.sheets?.ActorSheet ?? globalThis.ActorSheet);
+        DocumentSheetConfig.registerSheet(Actor, NGH_SYSTEM_ID, NGHActorSheet, {
+            types: ["character"],
+            makeDefault: true,
+        });
+        DocumentSheetConfig.registerSheet(Actor, NGH_SYSTEM_ID, NGHNPCSheet, {
+            types: ["npc"],
+            makeDefault: true,
+        });
+    }
+    else {
+        // v12 fallback
+        Actors.unregisterSheet("core", globalThis.ActorSheet);
+        Actors.registerSheet(NGH_SYSTEM_ID, NGHActorSheet, {
+            types: ["character"],
+            makeDefault: true,
+        });
+        Actors.registerSheet(NGH_SYSTEM_ID, NGHNPCSheet, {
+            types: ["npc"],
+            makeDefault: true,
+        });
+    }
     const localizedWeapons = Object.fromEntries(Object.keys(NGH_WEAPON_PROFILES).map((weaponId) => [weaponId, getWeaponProfile(weaponId)]));
     const gameWithApi = game;
     gameWithApi.ngh = {
@@ -128,6 +144,7 @@ Hooks.once("init", () => {
                 discardJourney: (cards, userId) => discardFromHand(cards, userId, "journey"),
                 returnToDeck: returnCardsFromHandToDeck,
                 returnJourneyToDeck: returnJourneyCardsToDeck,
+                returnDiscardedJokersToDeck,
                 reset: resetSharedDeck,
                 reshuffle: reshuffleDiscardsIntoDrawPile,
                 maxHandSize: getMaxHandSize,

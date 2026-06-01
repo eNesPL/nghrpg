@@ -15,6 +15,7 @@
       "GMOnly": "GM only",
       "EmptyHand": "No cards in hand.",
       "EmptyJourneyHand": "No cards in journey hand.",
+      "JourneyDealtHint": "Face-down Journey card. Reveal it from the Journey panel.",
       "Section": {
         "Attributes": "Attributes",
         "Skills": "Skills",
@@ -96,7 +97,7 @@
       "ApplyCorruptionJourney": "Resolve Corruption Journey Cards",
       "OpenJourneyPanel": "Journey Control",
       "OpenCombatPanel": "Combat Control",
-      "OpenGMToolsPanel": "GM Tools",
+      "OpenGMToolsPanel": "GM Screen",
       "Confirm": "OK",
       "Cancel": "Cancel",
       "GrantReward": "Grant Reward",
@@ -113,6 +114,7 @@
       "ElementalRitual": "Elemental Ritual",
       "OfficerShare": "Officer — Share Cards",
       "AllyBlackCardCorruption": "Stars / Holy Day",
+      "GroveCorruption": "Grove Risk",
       "TriggerCorruptionIncident": "Trigger Corruption Incident"
     },
     "Item": {
@@ -148,8 +150,10 @@
       "PanelTitle": "Journey Control",
       "GMHand": "GM Journey Hand",
       "EmptyGMHand": "The GM journey hand is empty.",
-      "PlayerJourneyHands": "Player Journey Hands",
-      "CardCount": "Cards: {count}",
+      "PlayerJourneyHands": "Players",
+      "CardCount": "Cards in hand: {count}",
+      "Contributed": "contributed",
+      "NotContributed": "waiting",
       "NoPlayers": "No players to display.",
       "CorruptionTitle": "Corruption Journey Cards",
       "CorruptionEntry": "Corruption {corruption}, cards {cards}",
@@ -194,7 +198,8 @@
       "Reveal": {
         "Instructions": "Each player in turn reveals their card and describes a scene related to the motif.",
         "Waiting": "(awaiting card)",
-        "Hidden": "(hidden card)"
+        "Hidden": "(hidden card)",
+        "AllRevealed": "All journey cards are already revealed."
       },
       "Resolve": {
         "Instructions": "Check requirements, announce bonus or penalty. All journey cards are discarded.",
@@ -314,9 +319,15 @@
       }
     },
     "GMTools": {
-      "PanelTitle": "GameMaster Tools",
-      "Subtitle": "Session-facing quick references and checklists for Never Going Home.",
+      "PanelTitle": "GM Screen",
+      "Subtitle": "Searchable table reference for rules, flows, and risks during play.",
       "Section": {
+        "Session": "Session",
+        "Rules": "Rules",
+        "CurrentState": "Table State",
+        "DeckState": "Deck and Journey",
+        "JourneyPool": "Journey Pool",
+        "Characters": "Characters",
         "CorruptionOverview": "Corruption Overview",
         "CorruptionTriggers": "Corruption Triggers",
         "JourneyFlow": "Journey Flow",
@@ -325,14 +336,54 @@
         "SessionChecklist": "Session Checklist"
       },
       "Label": {
-        "Corruption": "Corruption"
+        "Corruption": "Corruption",
+        "Player": "Player",
+        "JourneyPhase": "Journey Phase",
+        "Deck": "Deck",
+        "Discard": "Discard",
+        "StandardHands": "Cards in hands",
+        "JourneyHands": "Journey hand cards",
+        "ExtraBlind": "Extra blind cards",
+        "PoolCount": "Cards in pool",
+        "CorruptionJourneyCards": "Corruption Journey cards",
+        "JourneyReveal": "Reveal",
+        "StandardHand": "Hand",
+        "JourneyHand": "Journey Hand",
+        "Source": "Source:"
+      },
+      "Action": {
+        "Refresh": "Refresh GM Screen state"
+      },
+      "Character": {
+        "Unassigned": "unassigned",
+        "Contributed": "contributed to Journey",
+        "Waiting": "waiting for Journey",
+        "Revealed": "revealed",
+        "FaceDown": "face-down",
+        "AssignHint": "Assign this actor to a player to show their cards on the GM Screen."
+      },
+      "CharacterGroup": {
+        "Extreme": "Final Mission",
+        "ExtremeHint": "Corruption 5: last mission for this character.",
+        "Critical": "Critical Corruption",
+        "CriticalHint": "Corruption 4: GM may add +2 Journey cards.",
+        "High": "High Corruption",
+        "HighHint": "Corruption 3: GM may add +1 Journey card.",
+        "Stable": "Lower Corruption",
+        "StableHint": "Below the Corruption Journey-card threshold."
+      },
+      "Search": {
+        "Label": "Search rules",
+        "Placeholder": "Search: Journey, Corruption, +One, Grove...",
+        "Results": "Results",
+        "NoResults": "No matching rules."
       },
       "Empty": {
         "NoCharacters": "No character actors found."
       },
       "CorruptionTriggers": {
         "BlackJoker": "Black Joker played/revealed",
-        "Burns": "Black Joker burned (+One / Whisper / Healing)",
+        "Burns": "Black Joker spent or burned (+One / Whisper / Healing / Defense / Advancement)",
         "WhisperRank": "Whisper path advanced to rank 3/4/5",
         "ElementalRitual": "Elemental Ritual with empty hand and black top-deck card",
         "StarsHolyDay": "Stars / Holy Day when ally black card is used",
@@ -361,7 +412,7 @@
         "Corruption5": "Corruption 5: final mission state"
       },
       "SessionChecklist": {
-        "OpenPanels": "Open Journey / Combat / GM Tools panels",
+        "OpenPanels": "Open Journey / Combat / GM Screen panels",
         "ReviewCorruption": "Review corruption track for all characters",
         "VerifyDeck": "Verify deck/discard and reshuffle status",
         "CheckMission": "Set mission requirements before journey starts"
@@ -407,7 +458,8 @@
       "Table": {
         "Index": "Index",
         "Roll": "Roll",
-        "Reroll": "Reroll"
+        "Reroll": "Reroll",
+        "IncreaseBonus": "+1"
       }
     },
     "Chat": {
@@ -444,12 +496,16 @@
         "ResolveOutcome": "Outcome: {outcome}",
         "Source": "Source: {source}",
         "Played": "Played: {card}",
+        "PlayedHidden": "A card was added to the Journey.",
         "DrewBlind": "Drew blind: {card}",
-        "HandLeft": "Journey hand left: {count}",
+        "DrewBlindHidden": "A blind card was added to the Journey.",
+        "HandLeft": "Cards left in hand: {count}",
         "BlindCard": "Blind Journey Card",
         "BlindAdded": "Blind card drawn: {card}",
+        "BlindAddedHidden": "A blind card was added to the Journey.",
         "DealTitle": "Journey Cards Dealt",
         "DealtCard": "{user}: {card}",
+        "DealtHidden": "{count} journey card(s) dealt face-down.",
         "FinishTitle": "Journey Complete",
         "Finished": "The journey phase has ended. Cards resolved.",
         "EndMissionTitle": "Mission Complete",
@@ -477,8 +533,14 @@
         "Path": "Path: {path}",
         "Spell": "Spell: {spell}",
         "CostCard": "Cost paid: {card}",
+        "CostPaidHidden": "Card cost paid privately.",
         "BurnBlack": "Black Joker burned \u2014 Corruption Risk triggered!",
-        "Failed": "Result: failure \u2014 consider additional sacrifice (path-specific)."
+        "CorruptionRiskPrivate": "Corruption risk resolved privately.",
+        "Failed": "Result: failure \u2014 consider additional sacrifice (path-specific).",
+        "Sacrifice": "Additional sacrifice: {sacrifice}",
+        "SacrificeNone": "Additional sacrifice: none recorded.",
+        "ManualEffect": "Manual effect: {effect}",
+        "ManualEffectPending": "Manual effect: resolve from path text / GM ruling."
       },
       "BurnCard": {
         "Burned": "Burned: {cards}",
@@ -544,6 +606,7 @@
         "Title": "Corruption Journey Cards",
         "Total": "Resolved cards: {total}",
         "Drawn": "Drawn: {cards}",
+        "DrawnHidden": "Cards from Corruption were added face-down.",
         "Entry": "{actor}: corruption {corruption}, cards {cards}"
       },
       "CorruptionRisk": {
@@ -577,6 +640,7 @@
         "Whisper": "Whisper {path}: rank {from} \u2192 {to}",
         "Spent": "Cards spent: {cards}",
         "SameColor": "Same color \u2014 1 card kept.",
+        "SameColorKept": "Same color \u2014 kept: {card}.",
         "FacesBonus": "All faces/aces \u2014 effect +1!"      }
     },
     "CorruptionRisk": {
@@ -586,8 +650,12 @@
         "BlackJokerBurnPlusOne": "Black Joker \u2014 Burn for +One",
         "BlackJokerBurnWhisper": "Black Joker \u2014 Burn for Whisper",
         "BlackJokerBurnHeal": "Black Joker \u2014 Burn for Healing",
+        "BlackJokerDefense": "Black Joker \u2014 Card Defense",
+        "BlackJokerAdvancement": "Black Joker \u2014 Advancement",
+        "BlackJokerElementalRitual": "Black Joker \u2014 Elemental Ritual",
         "ElementalRitual": "Elemental Ritual \u2014 no cards in hand",
         "StarsHolyDay": "Stars / Holy Day \u2014 ally black card",
+        "Grove": "Grove \u2014 cards left on the table",
         "ManualIncident": "GM corruption incident",
         "ManualIncidentDetail": "Incident: {detail}",
         "OfficerShare": "Officer \u2014 sharing cards with squad",
@@ -600,7 +668,9 @@
         "NotLearned": "This whisper path has not been learned yet.",
         "SpellPrompt": "Spell name for path \"{path}\" (leave blank to skip):",
         "CostTitle": "Pay Whisper Cost",
-        "CostHint": "Select 1 card from hand to burn as whisper casting cost for path \"{path}\"."
+        "CostHint": "Select 1 card from hand to burn as whisper casting cost for path \"{path}\".",
+        "SacrificePrompt": "Additional sacrifice or path-specific cost notes (leave blank if none):",
+        "EffectPrompt": "Manual effect / outcome notes (leave blank if not resolved now):"
       }
     },
     "Officer": {
@@ -626,6 +696,9 @@
       "SkillDieHint": "Advance {skill}: rank {current} \u2192 {next}. Cost: {cost} cards.",
       "NewSkillHint": "Acquire {skill}. Cost: {cost} cards.",
       "WhisperHint": "Advance whisper {path}: rank {current} \u2192 {next}. Cost: {cost} cards.",
+      "ChooseCardToKeep": "Choose card to keep",
+      "ChooseCardToKeepHint": "All selected cards are the same color \u2014 choose which card to keep (it will not be spent):",
+      "Keep": "Keep",
       "Error": {
         "AttributeRedOnly": "Attribute advancement requires only red cards (\u2665/\u2666)."
       }
@@ -640,9 +713,10 @@
       "CardNotInJourneyHand": "Card {card} is not in the user's journey hand",
       "MissingJourneyUserId": "Missing userId for journey card use",
       "JourneyCardRequired": "A card from hand must be selected for journey use",
+      "JourneyBlindAlreadyContributed": "You already contributed to this Journey. Extra blind cards must be added from the Journey panel.",
       "GMOnlyJourneyPanel": "Only the GM can open Journey control",
       "GMOnlyCombatPanel": "Only the GM can open Combat Control",
-      "GMOnlyGMToolsPanel": "Only the GM can open GM Tools",
+      "GMOnlyGMToolsPanel": "Only the GM can open the GM Screen",
       "MissingInitiativeUserId": "Missing userId for initiative card use",
       "InitiativeCardRequired": "A card from hand must be selected for initiative",
       "MissingBurnUserId": "Missing userId for card burn",

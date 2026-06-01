@@ -339,11 +339,19 @@ export class NGHNPCSheet extends foundry.applications.api.HandlebarsApplicationM
     return count === 1 ? [result[0]] : result.slice(0, count);
   }
 
+  private getGMWhisperRecipients(): string[] {
+    const recipients = ((ChatMessage as any).getWhisperRecipients?.("GM") ?? []) as Array<{ id?: string }>;
+    return recipients.map((recipient) => String(recipient.id ?? "")).filter(Boolean);
+  }
+
   private async createChatMessage(title: string, lines: string[]): Promise<void> {
-    await ChatMessage.create({
+    const messageData: Record<string, unknown> = {
       speaker: ChatMessage.getSpeaker({ alias: String(this.actor.name) } as any),
       content: [`<h3>${this.escapeHtml(title)}</h3>`, ...lines.map((line) => `<p>${this.escapeHtml(line)}</p>`)].join(""),
-    });
+    };
+    const whisper = this.getGMWhisperRecipients();
+    if (whisper.length > 0) messageData.whisper = whisper;
+    await ChatMessage.create(messageData as any);
   }
 
   private async grantCardsToRecipients(

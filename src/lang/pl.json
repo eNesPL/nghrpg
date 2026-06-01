@@ -15,6 +15,7 @@
       "GMOnly": "Tylko MG",
       "EmptyHand": "Brak kart na ręce.",
       "EmptyJourneyHand": "Brak kart na ręce wędrówki.",
+      "JourneyDealtHint": "Zakryta karta Wędrówki. Odsłoń ją z panelu Wędrówki.",
       "Section": {
         "Attributes": "Atrybuty",
         "Skills": "Umiejętności",
@@ -96,7 +97,7 @@
       "ApplyCorruptionJourney": "Rozpatrz karty spaczenia do wędrówki",
       "OpenJourneyPanel": "Panel wędrówki",
       "OpenCombatPanel": "Panel walki",
-      "OpenGMToolsPanel": "Narzędzia MG",
+      "OpenGMToolsPanel": "Ekran MG",
       "Confirm": "OK",
       "Cancel": "Anuluj",
       "GrantReward": "Przyznaj nagrodę",
@@ -113,6 +114,7 @@
       "ElementalRitual": "Rytuał Żywiołów",
       "OfficerShare": "Oficer — Podziel karty",
       "AllyBlackCardCorruption": "Gwiazdy / Dzień Święty",
+      "GroveCorruption": "Ryzyko Zagajnika",
       "TriggerCorruptionIncident": "Wywołaj incydent Spaczenia"
     },
     "Item": {
@@ -148,8 +150,10 @@
       "PanelTitle": "Panel wędrówki",
       "GMHand": "Ręka MG do wędrówki",
       "EmptyGMHand": "MG nie ma kart na ręce wędrówki.",
-      "PlayerJourneyHands": "Ręce wędrówki graczy",
-      "CardCount": "Kart: {count}",
+      "PlayerJourneyHands": "Gracze",
+      "CardCount": "Kart na ręce: {count}",
+      "Contributed": "dołożono",
+      "NotContributed": "czeka",
       "NoPlayers": "Brak graczy do pokazania.",
       "CorruptionTitle": "Karty za Spaczenie",
       "CorruptionEntry": "Spaczenie {corruption}, karty {cards}",
@@ -193,7 +197,8 @@
       "Reveal": {
         "Instructions": "Ka\u017cdy gracz po kolei odsłania kart\u0119 i opisuje scen\u0119 zwi\u0105zan\u0105 z motywem.",
         "Waiting": "(oczekuje na kart\u0119)",
-        "Hidden": "(karta ukryta)"
+        "Hidden": "(karta ukryta)",
+        "AllRevealed": "Wszystkie karty Wędrówki są już odsłonięte."
       },
       "Resolve": {
         "Instructions": "Sprawdź wymagania, og\u0142o\u015b premi\u0119 lub kar\u0119. Wszystkie karty w\u0119dr\u00f3wki zostaj\u0105 odrzucone.",
@@ -311,9 +316,15 @@
         "Prompt": "Ostatnia osoba wybiera kto zaczyna następną rundę (nie siebie):"      }
     },
     "GMTools": {
-      "PanelTitle": "Narzędzia Mistrza Gry",
-      "Subtitle": "Skróty zasad i checklisty pomocne podczas prowadzenia sesji.",
+      "PanelTitle": "Ekran MG",
+      "Subtitle": "Przeszukiwalna ściąga zasad, przepływów i ryzyk do użycia przy stole.",
       "Section": {
+        "Session": "Sesja",
+        "Rules": "Zasady",
+        "CurrentState": "Stan stołu",
+        "DeckState": "Talia i Wędrówka",
+        "JourneyPool": "Pula Wędrówki",
+        "Characters": "Postacie",
         "CorruptionOverview": "Przegląd Spaczenia",
         "CorruptionTriggers": "Źródła Ryzyka Spaczenia",
         "JourneyFlow": "Przebieg Wędrówki",
@@ -322,14 +333,54 @@
         "SessionChecklist": "Checklista Sesji"
       },
       "Label": {
-        "Corruption": "Spaczenie"
+        "Corruption": "Spaczenie",
+        "Player": "Gracz",
+        "JourneyPhase": "Faza Wędrówki",
+        "Deck": "Talia",
+        "Discard": "Odrzucone",
+        "StandardHands": "Karty na rękach",
+        "JourneyHands": "Karty w rękach Wędrówki",
+        "ExtraBlind": "Dodatkowe karty w ciemno",
+        "PoolCount": "Kart w puli",
+        "CorruptionJourneyCards": "Karty ze Spaczenia",
+        "JourneyReveal": "Odsłonięcie",
+        "StandardHand": "Ręka",
+        "JourneyHand": "Ręka Wędrówki",
+        "Source": "Źródło:"
+      },
+      "Action": {
+        "Refresh": "Odśwież stan Ekranu MG"
+      },
+      "Character": {
+        "Unassigned": "bez przypisanego gracza",
+        "Contributed": "dołożono do Wędrówki",
+        "Waiting": "czeka na Wędrówkę",
+        "Revealed": "odsłonięta",
+        "FaceDown": "zakryta",
+        "AssignHint": "Przypisz postać do gracza, aby Ekran MG pokazywał jej karty."
+      },
+      "CharacterGroup": {
+        "Extreme": "Ostatnia misja",
+        "ExtremeHint": "Spaczenie 5: ostatnia misja postaci.",
+        "Critical": "Krytyczne Spaczenie",
+        "CriticalHint": "Spaczenie 4: Narrator może dołożyć +2 karty do Wędrówki.",
+        "High": "Wysokie Spaczenie",
+        "HighHint": "Spaczenie 3: Narrator może dołożyć +1 kartę do Wędrówki.",
+        "Stable": "Niższe Spaczenie",
+        "StableHint": "Poniżej progu kart Wędrówki ze Spaczenia."
+      },
+      "Search": {
+        "Label": "Szukaj zasad",
+        "Placeholder": "Szukaj: Wędrówka, Spaczenie, +One, Zagajnik...",
+        "Results": "Wyniki",
+        "NoResults": "Brak pasujących zasad."
       },
       "Empty": {
         "NoCharacters": "Brak aktorów postaci."
       },
       "CorruptionTriggers": {
         "BlackJoker": "Zagranie/odsłonięcie Czarnego Jokera",
-        "Burns": "Spalenie Czarnego Jokera (+One / Szept / Leczenie)",
+        "Burns": "Wydanie/spalenie Czarnego Jokera (+One / Szept / leczenie / obrona / rozwój)",
         "WhisperRank": "Awans Ścieżki Szeptów na poziom 3/4/5",
         "ElementalRitual": "Rytuał Żywiołów bez kart na ręce i czarna karta z talii",
         "StarsHolyDay": "Gwiazdy / Dzień Święty przy czarnej karcie sojusznika",
@@ -358,7 +409,7 @@
         "Corruption5": "Spaczenie 5: stan ostatniej misji"
       },
       "SessionChecklist": {
-        "OpenPanels": "Otwórz panele Wędrówki / Walki / Narzędzi MG",
+        "OpenPanels": "Otwórz panele Wędrówki / Walki / Ekranu MG",
         "ReviewCorruption": "Sprawdź poziomy Spaczenia wszystkich postaci",
         "VerifyDeck": "Sprawdź stan talii/stosu odrzuconych i przetasowanie",
         "CheckMission": "Ustal wymagania misji przed startem Wędrówki"
@@ -404,7 +455,8 @@
       "Table": {
         "Index": "Indeks",
         "Roll": "Wynik",
-        "Reroll": "Przerzut"
+        "Reroll": "Przerzut",
+        "IncreaseBonus": "+1"
       }
     },
     "Chat": {
@@ -441,12 +493,16 @@
         "ResolveOutcome": "Efekt: {outcome}",
         "Source": "Źródło: {source}",
         "Played": "Zagrano: {card}",
+        "PlayedHidden": "Kartę dołożono do Wędrówki.",
         "DrewBlind": "Dobrano w ciemno: {card}",
-        "HandLeft": "Kart na r\u0119ce w\u0119dr\u00f3wki: {count}",
+        "DrewBlindHidden": "Kartę w ciemno dołożono do Wędrówki.",
+        "HandLeft": "Kart na ręce: {count}",
         "BlindCard": "Karta w ciemno",
         "BlindAdded": "Dobrano kart\u0119 w ciemno: {card}",
+        "BlindAddedHidden": "Kartę w ciemno dołożono do Wędrówki.",
         "DealTitle": "Rozdano karty W\u0119dr\u00f3wki",
         "DealtCard": "{user}: {card}",
+        "DealtHidden": "Rozdano zakryte karty Wędrówki: {count}.",
         "FinishTitle": "W\u0119dr\u00f3wka zako\u0144czona",
         "Finished": "Faza w\u0119dr\u00f3wki zako\u0144czona. Karty rozliczone.",
         "EndMissionTitle": "Misja Zako\u0144czona",
@@ -474,8 +530,14 @@
         "Path": "Ścieżka: {path}",
         "Spell": "Czar: {spell}",
         "CostCard": "Opłacono koszt: {card}",
+        "CostPaidHidden": "Koszt kartą opłacono prywatnie.",
         "BurnBlack": "Spalono Czarnego Jokera \u2014 ryzyko Spaczenia!",
-        "Failed": "Wynik: niepowodzenie \u2014 rozważ dodatkowe poświęcenie (zależne od ścieżki)."
+        "CorruptionRiskPrivate": "Ryzyko Spaczenia rozpatrzono prywatnie.",
+        "Failed": "Wynik: niepowodzenie \u2014 rozważ dodatkowe poświęcenie (zależne od ścieżki).",
+        "Sacrifice": "Dodatkowe poświęcenie: {sacrifice}",
+        "SacrificeNone": "Dodatkowe poświęcenie: nie zapisano.",
+        "ManualEffect": "Efekt manualny: {effect}",
+        "ManualEffectPending": "Efekt manualny: rozpatrz z opisu ścieżki / decyzji MG."
       },
       "BurnCard": {
         "Burned": "Spalone: {cards}",
@@ -541,6 +603,7 @@
         "Title": "Karty wędrówki ze Spaczenia",
         "Total": "Rozpatrzone karty: {total}",
         "Drawn": "Dobrane: {cards}",
+        "DrawnHidden": "Karty ze Spaczenia dołożono zakryte.",
         "Entry": "{actor}: Spaczenie {corruption}, kart {cards}"
       },
       "CorruptionRisk": {
@@ -574,6 +637,7 @@
         "Whisper": "Szept {path}: poziom {from} \u2192 {to}",
         "Spent": "Wydane karty: {cards}",
         "SameColor": "Ten sam kolor \u2014 zachowano 1 kart\u0119.",
+        "SameColorKept": "Ten sam kolor \u2014 zachowano: {card}.",
         "FacesBonus": "Same figury/asy \u2014 efekt +1!"      }
     },
     "CorruptionRisk": {
@@ -583,8 +647,12 @@
         "BlackJokerBurnPlusOne": "Czarny Joker \u2014 Spalenie za +One",
         "BlackJokerBurnWhisper": "Czarny Joker \u2014 Spalenie za Szept",
         "BlackJokerBurnHeal": "Czarny Joker \u2014 Spalenie na Leczenie",
+        "BlackJokerDefense": "Czarny Joker \u2014 Obrona kartą",
+        "BlackJokerAdvancement": "Czarny Joker \u2014 Rozwój postaci",
+        "BlackJokerElementalRitual": "Czarny Joker \u2014 Rytuał Żywiołów",
         "ElementalRitual": "Rytuał Żywiołów \u2014 brak kart na ręce",
         "StarsHolyDay": "Gwiazdy / Dzień Święty \u2014 czarna karta sojusznika",
+        "Grove": "Zagajnik \u2014 karty pozostały na stole",
         "ManualIncident": "Incydent MG powodujący Spaczenie",
         "ManualIncidentDetail": "Incydent: {detail}",
         "OfficerShare": "Oficer \u2014 dzielenie kart z oddziałem",
@@ -597,7 +665,9 @@
         "NotLearned": "Ta ścieżka Szeptów nie została jeszcze nauczona.",
         "SpellPrompt": "Nazwa czaru ścieżki \"{path}\" (zostaw puste, aby pominąć):",
         "CostTitle": "Opłać koszt Szeptu",
-        "CostHint": "Wybierz 1 kartę z ręki do spalenia jako koszt rzucenia czaru ze ścieżki \"{path}\"."
+        "CostHint": "Wybierz 1 kartę z ręki do spalenia jako koszt rzucenia czaru ze ścieżki \"{path}\".",
+        "SacrificePrompt": "Dodatkowe poświęcenie lub koszt ścieżki (zostaw puste, jeśli brak):",
+        "EffectPrompt": "Efekt / rozstrzygnięcie manualne (zostaw puste, jeśli nie rozpatrujesz teraz):"
       }
     },
     "Officer": {
@@ -623,6 +693,9 @@
       "SkillDieHint": "Podnie\u015b {skill}: poziom {current} \u2192 {next}. Koszt: {cost} kart.",
       "NewSkillHint": "Kup {skill}. Koszt: {cost} kart.",
       "WhisperHint": "Podnie\u015b Szept {path}: poziom {current} \u2192 {next}. Koszt: {cost} kart.",
+      "ChooseCardToKeep": "Wybierz kart\u0119 do zachowania",
+      "ChooseCardToKeepHint": "Wszystkie wybrane karty s\u0105 tego samego koloru \u2014 wybierz, kt\u00f3r\u0105 chcesz zachowa\u0107 (nie zostanie wydana):",
+      "Keep": "Zachowaj",
       "Error": {
         "AttributeRedOnly": "Podniesienie atrybutu wymaga wy\u0142\u0105cznie czerwonych kart (\u2665/\u2666)."
       }
@@ -637,9 +710,10 @@
       "CardNotInJourneyHand": "Karta {card} nie znajduje się na ręce wędrówki użytkownika",
       "MissingJourneyUserId": "Brak userId dla użycia karty podróży",
       "JourneyCardRequired": "Do podróży trzeba wybrać kartę z ręki",
+      "JourneyBlindAlreadyContributed": "Ta postać już dołożyła kartę do Wędrówki. Dodatkowe ślepe karty dodaje się z panelu Wędrówki.",
       "GMOnlyJourneyPanel": "Tylko MG może otworzyć panel wędrówki",
       "GMOnlyCombatPanel": "Tylko MG może otworzyć panel walki",
-      "GMOnlyGMToolsPanel": "Tylko MG może otworzyć Narzędzia MG",
+      "GMOnlyGMToolsPanel": "Tylko MG może otworzyć Ekran MG",
       "MissingInitiativeUserId": "Brak userId dla inicjatywy",
       "InitiativeCardRequired": "Do inicjatywy trzeba wybrać kartę z ręki",
       "MissingBurnUserId": "Brak userId dla spalenia kart",

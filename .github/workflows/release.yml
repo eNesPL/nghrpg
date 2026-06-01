@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New version (e.g. 0.1.49)"
+        required: true
+        type: string
+
+env:
+  SYSTEM_ID: nghrpg
+  SYSTEM_NAME: Never Going Home
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Update system.json version
+        uses: jossef/action-set-json-field@v2.2
+        with:
+          file: dist/system.json
+          field: version
+          value: ${{ inputs.version }}
+
+      - name: Set manifest URL
+        uses: jossef/action-set-json-field@v2.2
+        with:
+          file: dist/system.json
+          field: manifest
+          value: https://github.com/${{ github.repository }}/releases/latest/download/system.json
+
+      - name: Set download URL
+        uses: jossef/action-set-json-field@v2.2
+        with:
+          file: dist/system.json
+          field: download
+          value: https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/${{ env.SYSTEM_ID }}.zip
+
+      - name: Create release zip
+        run: |
+          cd dist
+          zip -r ../${{ env.SYSTEM_ID }}.zip .
+
+      - name: Create tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag v${{ inputs.version }}
+          git push origin v${{ inputs.version }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: v${{ inputs.version }}
+          body: |
+            ## ${{ env.SYSTEM_NAME }} v${{ inputs.version }}
+
+            **Installation:** In Foundry VTT, use this manifest URL:
+            ```
+            https://github.com/${{ github.repository }}/releases/latest/download/system.json
+            ```
+          files: |
+            ${{ env.SYSTEM_ID }}.zip
+            dist/system.json
+          fail_on_unmatched_files: true

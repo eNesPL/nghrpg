@@ -2,7 +2,7 @@
   "id": "nghrpg",
   "title": "Never Going Home",
   "description": "Unofficial system for playing Never Going Home in Foundry VTT.",
-  "version": "0.1.42",
+  "version": "0.1.48",
   "compatibility": {
     "minimum": 12,
     "verified": 13
@@ -64,7 +64,7 @@
       "scar": {}
     }
   },
-  "socket": false,
+  "socket": true,
   "initiative": "1d20",
   "grid": {
     "distance": 5,

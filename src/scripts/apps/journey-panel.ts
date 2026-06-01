@@ -179,10 +179,11 @@ type JourneyPhase = "configure" | "collect" | "deal" | "reveal" | "resolve";
 type NGHJourneyApi = {
   mechanics: {
     cards: {
-      getState: () => { journeyHands: Record<string, string[]>; discardPile: string[] };
+      getState: () => { hands: Record<string, string[]>; journeyHands: Record<string, string[]>; discardPile: string[] };
       getJourneyHand: (userId?: string) => string[];
       discardJourney: (cards: string[], userId?: string) => Promise<{ discarded: string[]; hand: string[] }>;
       returnJourneyToDeck: (cards: string[], userId?: string) => Promise<{ returned: string[]; hand: string[] }>;
+      returnDiscardedJokersToDeck: (cards: string[]) => Promise<unknown>;
       isJoker: (card: string) => boolean;
       maxJourneyHandSize: () => number;
       parse: (card: string) => { code: string; label: string };
@@ -297,8 +298,12 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     classes: ["ngh", "journey-panel-app"],
     tag: "section",
     position: { width: 680, height: 860 },
-    window: { title: "Journey Control", resizable: true },
+    window: { resizable: true },
   };
+
+  override get title(): string {
+    return game.i18n?.localize("NGH.Journey.PanelTitle") ?? "Journey Control";
+  }
 
   static override PARTS = {
     body: {
@@ -309,12 +314,14 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
   async _prepareContext(): Promise<any> {
     const state = this.api.mechanics.cards.getState();
     const gmJourneyHand = this.api.mechanics.cards.getJourneyHand(this.userId).map((card) => this.api.mechanics.cards.parse(card));
+    const playedUserIds = this.getPlayedUserIds();
     const users = Array.from(((game as any).users?.contents ?? (game as any).users ?? []) as any[])
       .filter((user) => user?.id && !user.isGM)
       .map((user) => ({
         userId: String(user.id),
         name: String(user.name ?? user.id),
-        count: state.journeyHands[String(user.id)]?.length ?? 0,
+        count: state.hands[String(user.id)]?.length ?? 0,
+        contributed: playedUserIds.includes(String(user.id)),
       }));
     const corruptionRecommendations = this.getCorruptionRecommendations();
     const phase = this.getPhase();
@@ -324,7 +331,6 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
 
     const poolCards = this.getJourneyPoolCards();
     const revealSlots = this.getRevealSlots(state);
-    const playedUserIds = this.getPlayedUserIds();
     const allPlayersContributed = users.every((user) => playedUserIds.includes(user.userId));
     const allJourneyCards = poolCards.map((card) => ({
       userId: "",
@@ -351,7 +357,7 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
 
     const dealtCards = revealSlots.map((slot) => {
       const revealedCode = revealedCards[slot.revealKey] ?? null;
-      const shouldReveal = phase === "resolve" || Boolean(revealedCode);
+      const shouldReveal = Boolean(revealedCode);
       const visibleCard = shouldReveal ? (revealedCode ?? slot.card) : null;
       return {
         userId: slot.userId,
@@ -364,6 +370,7 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     });
 
     const totalCollected = poolCards.length;
+    const allCardsRevealed = dealtCards.length > 0 && dealtCards.every((entry) => entry.isRevealed);
 
     return {
       cssClass: "ngh",
@@ -387,7 +394,8 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
       canDeal: phase === "deal" && totalCollected > 0 && allPlayersContributed,
       canDealFromCollect: phase === "collect" && totalCollected > 0 && allPlayersContributed,
       canRevealAll: phase === "reveal" && dealtCards.some((entry) => !entry.isRevealed),
-      canAutoResolve: (phase === "reveal" || phase === "resolve") && dealtCards.length > 0 && dealtCards.every((entry) => entry.isRevealed),
+      canAutoResolve: (phase === "reveal" || phase === "resolve") && allCardsRevealed,
+      canResolve: (phase === "reveal" || phase === "resolve") && allCardsRevealed,
       requirementResult,
       allPlayersContributed,
       bonus: this.getBonus(),
@@ -442,7 +450,8 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
         const slotIndex = Number((event.currentTarget as HTMLElement).dataset.slot);
         run(() => this._doRevealSlot(slotIndex));
       });
-    });
+    });
+
     root.querySelector("[data-action='journey-auto-resolve']")?.addEventListener("click", () => {
       run(() => this._doAutoResolveRequirements());
     });
@@ -465,22 +474,28 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     const requirementsField = root.querySelector<HTMLTextAreaElement>("textarea[name='journey-requirements']");
     if (requirementsField) {
       requirementsField.addEventListener("blur", () => {
-        void (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_REQUIREMENTS_SETTING, requirementsField.value ?? "");
-        broadcastJourneyUpdate();
+        void (async () => {
+          await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_REQUIREMENTS_SETTING, requirementsField.value ?? "");
+          broadcastJourneyUpdate();
+        })();
       });
     }
     const bonusField = root.querySelector<HTMLTextAreaElement>("textarea[name='journey-bonus']");
     if (bonusField) {
       bonusField.addEventListener("blur", () => {
-        void (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_BONUS_SETTING, bonusField.value ?? "");
-        broadcastJourneyUpdate();
+        void (async () => {
+          await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_BONUS_SETTING, bonusField.value ?? "");
+          broadcastJourneyUpdate();
+        })();
       });
     }
     const penaltyField = root.querySelector<HTMLTextAreaElement>("textarea[name='journey-penalty']");
     if (penaltyField) {
       penaltyField.addEventListener("blur", () => {
-        void (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_PENALTY_SETTING, penaltyField.value ?? "");
-        broadcastJourneyUpdate();
+        void (async () => {
+          await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_PENALTY_SETTING, penaltyField.value ?? "");
+          broadcastJourneyUpdate();
+        })();
       });
     }
   }
@@ -510,44 +525,49 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     void this.render();
     broadcastJourneyUpdate("reveal");
 
-    // A03: Handle Black Joker slot — trigger corruption risk if needed
-    const BLACK_JOKER = "BJ";
-    if (slot.card === BLACK_JOKER) {
-      const isGMSlot = slot.revealKey.startsWith("gm:");
-      if (isGMSlot) {
-        await this.createChatMessage(
-          this.t("NGH.Chat.Journey.BJGMSlotTitle", "Black Joker — Blind Slot"),
-          [this.t("NGH.Chat.Journey.BJGMSlotWarning",
-            "A Black Joker appeared in a blind/surplus journey slot. Assign corruption risk to the appropriate player manually.")]
-        );
-      } else {
-        const user = ((game as any).users?.get(slot.userId)) as any;
-        const actor = user?.character ?? null;
-        const riskResult = await this.api.mechanics.cards.drawForCorruptionRisk();
-        const riskLines: string[] = [
-          this.tf("NGH.Chat.Journey.BJPlayerSlotAffected", { user: slot.userName },
-            `Black Joker in ${slot.userName}'s journey slot — Corruption Risk:`),
-          this.tf("NGH.Chat.CorruptionRisk.Card", { card: riskResult.drewCard || "?" },
-            `Card drawn: ${riskResult.drewCard || "?"}`),
-          riskResult.isBlack
-            ? this.t("NGH.Chat.CorruptionRisk.Black", "Black card — Corruption +1")
-            : this.t("NGH.Chat.CorruptionRisk.Red", "Red card — no corruption."),
-        ];
-        if (riskResult.isBlack && actor) {
-          const current = Number(actor.system?.corruption ?? 0);
-          await actor.update({ "system.corruption": Math.min(5, current + 1) });
-          riskLines.push(this.tf("NGH.Chat.Journey.BJCorruptionApplied", { name: String(actor.name ?? slot.userName) },
-            `Corruption applied to ${String(actor.name ?? slot.userName)}.`));
-        } else if (riskResult.isBlack) {
-          riskLines.push(this.tf("NGH.Chat.Journey.BJNoActorWarning", { user: slot.userName },
-            `No linked character found for ${slot.userName} — apply Corruption +1 manually.`));
-        }
-        await this.createChatMessage(
-          this.t("NGH.Chat.CorruptionRisk.Title", "Corruption Risk"),
-          riskLines
-        );
-      }
+    await this.handleBlackJokerJourneyReveal(slot);
+  }
+
+  private async handleBlackJokerJourneyReveal(slot: JourneyRevealSlot): Promise<void> {
+    if (slot.card !== "BJ") return;
+
+    const isGMSlot = slot.revealKey.startsWith("gm:");
+    if (isGMSlot) {
+      await this.createChatMessage(
+        this.t("NGH.Chat.Journey.BJGMSlotTitle", "Black Joker — Blind Slot"),
+        [this.t("NGH.Chat.Journey.BJGMSlotWarning",
+          "A Black Joker appeared in a blind/surplus journey slot. Assign corruption risk to the appropriate player manually.")],
+        { whisper: this.getCorruptionWhisperRecipients() }
+      );
+      return;
     }
+
+    const user = ((game as any).users?.get(slot.userId)) as any;
+    const actor = user?.character ?? null;
+    const riskResult = await this.api.mechanics.cards.drawForCorruptionRisk();
+    const riskLines: string[] = [
+      this.tf("NGH.Chat.Journey.BJPlayerSlotAffected", { user: slot.userName },
+        `Black Joker in ${slot.userName}'s journey slot — Corruption Risk:`),
+      this.tf("NGH.Chat.CorruptionRisk.Card", { card: riskResult.drewCard || "?" },
+        `Card drawn: ${riskResult.drewCard || "?"}`),
+      riskResult.isBlack
+        ? this.t("NGH.Chat.CorruptionRisk.Black", "Black card — Corruption +1")
+        : this.t("NGH.Chat.CorruptionRisk.Red", "Red card — no corruption."),
+    ];
+    if (riskResult.isBlack && actor) {
+      const current = Number(actor.system?.corruption ?? 0);
+      await actor.update({ "system.corruption": Math.min(5, current + 1) });
+      riskLines.push(this.tf("NGH.Chat.Journey.BJCorruptionApplied", { name: String(actor.name ?? slot.userName) },
+        `Corruption applied to ${String(actor.name ?? slot.userName)}.`));
+    } else if (riskResult.isBlack) {
+      riskLines.push(this.tf("NGH.Chat.Journey.BJNoActorWarning", { user: slot.userName },
+        `No linked character found for ${slot.userName} — apply Corruption +1 manually.`));
+    }
+    await this.createChatMessage(
+      this.t("NGH.Chat.CorruptionRisk.Title", "Corruption Risk"),
+      riskLines,
+      { whisper: this.getCorruptionWhisperRecipients(slot.userId) }
+    );
   }
 
 
@@ -706,9 +726,27 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_POOL_SETTING, JSON.stringify(cards));
   }
 
+  private async returnUndealtJourneyPoolJokers(): Promise<void> {
+    const poolJokers = this.getJourneyPoolCards().filter((card) => this.api.mechanics.cards.isJoker(card));
+    if (poolJokers.length > 0) {
+      await this.api.mechanics.cards.returnDiscardedJokersToDeck(poolJokers);
+    }
+  }
+
   private async _doSetPhase(phase: JourneyPhase): Promise<void> {
+    if (phase === "resolve") {
+      const slots = this.getRevealSlots();
+      const revealed = this.getRevealedCards();
+      const allRevealed = slots.length > 0 && slots.every((slot) => Boolean(revealed[slot.revealKey]));
+      if (!allRevealed) {
+        ui.notifications?.warn(this.t("NGH.Journey.Resolve.NoRevealedCards", "Reveal journey cards before resolving requirements."));
+        return;
+      }
+    }
+
     await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_PHASE_SETTING, phase);
     if (phase === "collect") {
+      await this.returnUndealtJourneyPoolJokers();
       await this.setJourneyPoolCards([]);
       await this.setRevealedCards({});
       await this.setRequirementResult(null);
@@ -741,7 +779,7 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     void this.render();
     broadcastJourneyUpdate();
     await this.createChatMessage(this.t("NGH.Chat.Journey.BlindCard", "Blind Journey Card"), [
-      this.tf("NGH.Chat.Journey.BlindAdded", { card: result.drawn[0] ?? "?" }, `Blind card drawn: ${result.drawn[0] ?? "?"}`),
+      this.t("NGH.Chat.Journey.BlindAddedHidden", "A blind card was added to the Journey."),
     ]);
   }
 
@@ -789,11 +827,10 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     void this.render();
     broadcastJourneyUpdate("update");
 
-    const dealtLines = Object.entries(dealt).map(([userId, card]) => {
-      const userName = ((game as any).users?.get(userId))?.name ?? userId;
-      return this.tf("NGH.Chat.Journey.DealtCard", { user: userName, card }, `${userName}: ${card}`);
-    });
-    await this.createChatMessage(this.t("NGH.Chat.Journey.DealTitle", "Journey Cards Dealt"), dealtLines);
+    const dealtCount = Object.values(dealt).length;
+    await this.createChatMessage(this.t("NGH.Chat.Journey.DealTitle", "Journey Cards Dealt"), [
+      this.tf("NGH.Chat.Journey.DealtHidden", { count: dealtCount }, `${dealtCount} journey card(s) dealt face-down.`)
+    ]);
   }
 
   private async _doFinishJourney(): Promise<void> {
@@ -816,6 +853,7 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
       }
     }
 
+    await this.returnUndealtJourneyPoolJokers();
     await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_PHASE_SETTING, "configure" as JourneyPhase);
     await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_REQUIREMENTS_SETTING, "");
     await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_BONUS_SETTING, "");
@@ -910,11 +948,24 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
       .filter((entry) => entry.cards > 0);
   }
 
-  private async createChatMessage(title: string, lines: string[]): Promise<void> {
-    await ChatMessage.create({
+  private getCorruptionWhisperRecipients(userId?: string): string[] {
+    const recipients = new Set<string>();
+    const gmRecipients = ((ChatMessage as any).getWhisperRecipients?.("GM") ?? []) as Array<{ id?: string }>;
+    for (const recipient of gmRecipients) {
+      if (recipient?.id) recipients.add(String(recipient.id));
+    }
+    if (userId) recipients.add(userId);
+    if (game.user?.id) recipients.add(String(game.user.id));
+    return [...recipients];
+  }
+
+  private async createChatMessage(title: string, lines: string[], options: { whisper?: string[] } = {}): Promise<void> {
+    const messageData: Record<string, unknown> = {
       speaker: ChatMessage.getSpeaker({ alias: this.t("NGH.Journey.PanelTitle", "Journey Control") } as any),
       content: [`<h3>${title}</h3>`, ...lines.map((line) => `<p>${line}</p>`)].join(""),
-    });
+    };
+    if (options.whisper?.length) messageData.whisper = options.whisper;
+    await ChatMessage.create(messageData as any);
   }
 
   private async promptConfirm(message: string): Promise<boolean> {
@@ -934,7 +985,7 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     await this.createChatMessage(this.t("NGH.Chat.DrawJourneyCard.Title", "Draw Journey Card"), [
       this.tf("NGH.Chat.DrawJourneyCard.Drawn", { drawn: result.drawn.join(", ") || this.t("NGH.Common.None", "none") }, `Drawn: ${result.drawn.join(", ") || "none"}`),
       this.tf("NGH.Chat.DrawJourneyCard.Hand", { current: result.hand.length, max: this.api.mechanics.cards.maxJourneyHandSize() }, `Journey hand: ${result.hand.length}/${this.api.mechanics.cards.maxJourneyHandSize()}`),
-    ]);
+    ], { whisper: this.getCorruptionWhisperRecipients(this.userId) });
     void this.render();
     broadcastJourneyUpdate("update");
   }
@@ -949,9 +1000,9 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
       await this.markUserPlayed(this.userId);
     }
     await this.createChatMessage(this.t("NGH.Chat.Journey.Title", "Journey"), [
-      this.tf("NGH.Chat.Journey.Source", { source: result.source }, `Source: ${result.source}`),
-      this.tf(result.source === "top-deck" ? "NGH.Chat.Journey.DrewBlind" : "NGH.Chat.Journey.Played", { card: result.playedCards[0] ?? this.t("NGH.Common.None", "none") }, `${result.source === "top-deck" ? "Drew blind" : "Played"}: ${result.playedCards[0] ?? "none"}`),
-      this.tf("NGH.Chat.Journey.HandLeft", { count: result.hand.length }, `Journey hand left: ${result.hand.length}`),
+      result.source === "top-deck"
+        ? this.t("NGH.Chat.Journey.DrewBlindHidden", "A blind card was added to the Journey.")
+        : this.t("NGH.Chat.Journey.PlayedHidden", "A card was added to the Journey."),
     ]);
     void this.render();
     broadcastJourneyUpdate("update");
@@ -981,7 +1032,7 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     }
     await this.createChatMessage(this.t("NGH.Chat.CorruptionJourney.Title", "Corruption Journey Cards"), [
       this.tf("NGH.Chat.CorruptionJourney.Total", { total: result.drawn.length }, `Corruption cards resolved: ${result.drawn.length}`),
-      this.tf("NGH.Chat.CorruptionJourney.Drawn", { cards: result.drawn.join(", ") || this.t("NGH.Common.None", "none") }, `Drawn: ${result.drawn.join(", ") || "none"}`),
+      this.t("NGH.Chat.CorruptionJourney.DrawnHidden", "Cards from Corruption were added face-down."),
       ...recommendations.map((entry) => this.tf("NGH.Chat.CorruptionJourney.Entry", { actor: entry.actorName, corruption: entry.corruption, cards: entry.cards }, `${entry.actorName}: corruption ${entry.corruption}, cards ${entry.cards}`)),
     ]);
     void this.render();
@@ -991,63 +1042,27 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
   private async _doRevealAllCards(): Promise<void> {
     const state = this.api.mechanics.cards.getState();
     const slots = this.getRevealSlots(state);
-    const revealed: Record<string, string> = {};
-    for (const slot of slots) {
+    const revealed: Record<string, string> = { ...this.getRevealedCards() };
+    const newlyRevealed = slots.filter((slot) => !revealed[slot.revealKey]);
+    if (newlyRevealed.length < 1) {
+      ui.notifications?.info(this.t("NGH.Journey.Reveal.AllRevealed", "All journey cards are already revealed."));
+      return;
+    }
+
+    for (const slot of newlyRevealed) {
       revealed[slot.revealKey] = slot.card;
     }
 
     await this.setRevealedCards(revealed);
     await this.createChatMessage(
       this.t("NGH.Chat.Journey.RevealTitle", "Journey Reveal"),
-      slots.map((slot) => this.tf("NGH.Chat.Journey.RevealedCard", { user: slot.userName, card: slot.card }, `${slot.userName}: ${slot.card}`))
+      newlyRevealed.map((slot) => this.tf("NGH.Chat.Journey.RevealedCard", { user: slot.userName, card: slot.card }, `${slot.userName}: ${slot.card}`))
     );
     void this.render();
     broadcastJourneyUpdate("reveal");
 
-    // A03: Handle Black Joker slots — trigger corruption risk per affected player
-    const BLACK_JOKER = "BJ";
-    const bjSlots = slots.filter((slot) => slot.card === BLACK_JOKER);
-    for (const slot of bjSlots) {
-      const isGMSlot = slot.revealKey.startsWith("gm:");
-      if (isGMSlot) {
-        // BJ in a blind/surplus slot — warn GM, no specific player
-        await this.createChatMessage(
-          this.t("NGH.Chat.Journey.BJGMSlotTitle", "Black Joker — Blind Slot"),
-          [this.t("NGH.Chat.Journey.BJGMSlotWarning",
-            "A Black Joker appeared in a blind/surplus journey slot. Assign corruption risk to the appropriate player manually.")]
-        );
-        continue;
-      }
-
-      // BJ in a player's dealt slot → trigger corruption risk
-      const user = ((game as any).users?.get(slot.userId)) as any;
-      const actor = user?.character ?? null;
-
-      const riskResult = await this.api.mechanics.cards.drawForCorruptionRisk();
-      const riskLines: string[] = [
-        this.tf("NGH.Chat.Journey.BJPlayerSlotAffected", { user: slot.userName },
-          `Black Joker in ${slot.userName}'s journey slot — Corruption Risk:`),
-        this.tf("NGH.Chat.CorruptionRisk.Card", { card: riskResult.drewCard || "?" },
-          `Card drawn: ${riskResult.drewCard || "?"}`),
-        riskResult.isBlack
-          ? this.t("NGH.Chat.CorruptionRisk.Black", "Black card — Corruption +1")
-          : this.t("NGH.Chat.CorruptionRisk.Red", "Red card — no corruption."),
-      ];
-
-      if (riskResult.isBlack && actor) {
-        const current = Number(actor.system?.corruption ?? 0);
-        await actor.update({ "system.corruption": Math.min(5, current + 1) });
-        riskLines.push(this.tf("NGH.Chat.Journey.BJCorruptionApplied", { name: String(actor.name ?? slot.userName) },
-          `Corruption applied to ${String(actor.name ?? slot.userName)}.`));
-      } else if (riskResult.isBlack) {
-        riskLines.push(this.tf("NGH.Chat.Journey.BJNoActorWarning", { user: slot.userName },
-          `No linked character found for ${slot.userName} — apply Corruption +1 manually.`));
-      }
-
-      await this.createChatMessage(
-        this.t("NGH.Chat.CorruptionRisk.Title", "Corruption Risk"),
-        riskLines
-      );
+    for (const slot of newlyRevealed) {
+      await this.handleBlackJokerJourneyReveal(slot);
     }
   }
 
@@ -1058,7 +1073,7 @@ export class NGHJourneyPanel extends foundry.applications.api.HandlebarsApplicat
     const cards = slots
       .map((slot) => revealed[slot.revealKey] ?? "")
       .filter((card): card is string => Boolean(card));
-    if (cards.length < 1 || cards.length < slots.length) {
+    if (slots.length > 0 && (cards.length < 1 || cards.length < slots.length)) {
       ui.notifications?.warn(this.t("NGH.Journey.Resolve.NoRevealedCards", "Reveal journey cards before resolving requirements."));
       return;
     }

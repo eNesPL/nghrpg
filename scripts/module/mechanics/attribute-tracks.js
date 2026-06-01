@@ -78,8 +78,10 @@ export const preventDamageWithCards = async (actor, attribute, incomingDamage, c
     const damage = clampInt(incomingDamage, 0);
     const usableCards = cards.slice(0, damage);
     const preventedDamage = usableCards.length;
+    let triggersCorruptionRisk = false;
     if (usableCards.length > 0) {
-        await burnCardsForHealing(usableCards, userId);
+        const burnResult = await burnCardsForHealing(usableCards, userId);
+        triggersCorruptionRisk = burnResult.triggersCorruptionRisk;
     }
     const remainingDamage = Math.max(0, damage - preventedDamage);
     const result = await applyAttributeDamage(actor, attribute, remainingDamage);
@@ -88,6 +90,8 @@ export const preventDamageWithCards = async (actor, attribute, incomingDamage, c
         incomingDamage: damage,
         preventedDamage,
         appliedDamage: remainingDamage,
-        changedBy: -remainingDamage
+        changedBy: -remainingDamage,
+        burnedCards: usableCards,
+        triggersCorruptionRisk
     };
 };

@@ -182,7 +182,10 @@ const getAvailableCards = (stack: any): any[] => {
 };
 
 const getCardCode = (card: any): string => {
-  const code = card?.name ?? "";
+  // card.name is overridden by Foundry to return currentFace?.name ?? back.name.
+  // Face-down cards in the deck have no currentFace, so card.name returns "Back".
+  // card.faces[0]?.name is always the canonical code we stored when creating the card.
+  const code = card?.faces?.[0]?.name ?? card?.name ?? "";
   return String(code);
 };
 
@@ -311,11 +314,36 @@ const rebuildDeck = async (deck: any): Promise<void> => {
 };
 
 const ensureCanonicalDeck = async (deck: any): Promise<void> => {
-  const deckCodes = getEmbeddedCards(deck).map(getCardCode).sort();
+  const discard = findStackByRole("discard");
+  const hands = getCardsCollection().filter((stack) => getFlag(stack, STACK_ROLE_FLAG) === "hand");
+
+  const deckAll = getEmbeddedCards(deck);
+  const deckAvailable = getAvailableCards(deck);
+  const deckDrawnCount = deckAll.length - deckAvailable.length;
+  const discardCards = discard ? getEmbeddedCards(discard) : [];
+  const handCards = hands.flatMap((hand: any) => getEmbeddedCards(hand));
+
+  console.log(`[NGH|ensureCanonicalDeck] deck total=${deckAll.length} available=${deckAvailable.length} drawn(flag)=${deckDrawnCount} | discard=${discardCards.length} | hands(${hands.length} stacks)=${handCards.length}`);
+
+  const allCodes = [
+    ...deckAvailable.map(getCardCode),
+    ...discardCards.map(getCardCode),
+    ...handCards.map(getCardCode)
+  ].sort();
+
   const canonical = [...getCanonicalDeck()].sort();
-  const isValid = deckCodes.length === canonical.length && deckCodes.every((code, index) => code === canonical[index]);
-  if (isValid) return;
-  await rebuildDeck(deck);
+  const isValid = allCodes.length === canonical.length && allCodes.every((code, index) => code === canonical[index]);
+  console.log(`[NGH|ensureCanonicalDeck] counted=${allCodes.length} canonical=${canonical.length} valid=${isValid}`);
+  if (!isValid) {
+    const inActualNotCanon = allCodes.filter((c) => !canonical.includes(c));
+    const inCanonNotActual = canonical.filter((c) => !allCodes.includes(c));
+    console.warn(`[NGH|ensureCanonicalDeck] MISMATCH — in actual but NOT canonical: [${inActualNotCanon.join(", ")}]`);
+    console.warn(`[NGH|ensureCanonicalDeck] MISMATCH — in canonical but NOT actual: [${inCanonNotActual.join(", ")}]`);
+    console.warn(`[NGH|ensureCanonicalDeck] actual sample (first 10): [${allCodes.slice(0, 10).join(", ")}]`);
+    console.warn(`[NGH|ensureCanonicalDeck] canonical sample (first 10): [${canonical.slice(0, 10).join(", ")}]`);
+    console.warn(`[NGH|ensureCanonicalDeck] REBUILDING DECK!`);
+    await rebuildDeck(deck);
+  }
 };
 
 const ensureCoreStacks = async (): Promise<{ deck: any; discard: any }> => {
@@ -464,19 +492,31 @@ export const drawFromSharedDeck = async (
   const freeSlots = Math.max(0, MAX_HAND_SIZE - currentHand.length);
   const drawCount = Math.max(0, Math.min(Math.floor(requestedCount), freeSlots));
 
-  if (drawCount > 0) {
+  console.log(`[NGH|drawFromSharedDeck] userId=${userId} kind=${handKind} handBefore=[${currentHand.join(", ")}] freeSlots=${freeSlots} drawCount=${drawCount}`);
+
+  const drawnCards: any[] = [];
+  for (let index = 0; index < drawCount; index += 1) {
     await recallDiscardIntoDeckIfNeeded(deck, discard);
-    if (getAvailableCards(deck).length > 0) {
-      await hand.draw(deck, drawCount, { how: getTopDrawMode(), updateData: { face: 0 } });
-    }
+    if (getAvailableCards(deck).length < 1) break;
+
+    const drawn = await hand.draw(deck, 1, {
+      how: getTopDrawMode(),
+      updateData: { face: 0 },
+      chatNotification: false
+    });
+    console.log(`[NGH|drawFromSharedDeck] draw #${index + 1} result:`, drawn.map(getCardCode));
+    drawnCards.push(...drawn);
   }
+
+  const handAfter = getEmbeddedCards(findUserHand(userId, handKind) ?? hand).map(getCardCode);
+  console.log(`[NGH|drawFromSharedDeck] handAfter=[${handAfter.join(", ")}] totalDrawn=${drawnCards.length}`);
 
   const state = getSharedDeckState();
   const snapshot = handKind === "journey" ? state.journeyHands : state.hands;
   return {
     userId,
     handKind,
-    drawn: (snapshot[userId] ?? []).slice(currentHand.length),
+    drawn: drawnCards.map(getCardCode),
     hand: [...(snapshot[userId] ?? [])],
     drawPileCount: state.drawPile.length,
     discardPileCount: state.discardPile.length,
@@ -525,12 +565,25 @@ export const drawTopDeckCards = async (requestedCount = 1, discard = true): Prom
   const drawn: string[] = [];
   const total = Math.max(0, Math.floor(requestedCount));
 
+  if (!discard) {
+    drawn.push(...getAvailableCards(deck).slice(0, total).map(getCardCode));
+    const state = getSharedDeckState();
+    return {
+      drawn,
+      drawPileCount: state.drawPile.length,
+      discardPileCount: state.discardPile.length
+    };
+  }
+
   for (let idx = 0; idx < total; idx += 1) {
     await recallDiscardIntoDeckIfNeeded(deck, discardStack);
     if (getAvailableCards(deck).length < 1) break;
 
-    const targetStack = discard ? discardStack : deck;
-    const drawnCards = await targetStack.draw(deck, 1, { how: getTopDrawMode(), updateData: { face: 0 } });
+    const drawnCards = await discardStack.draw(deck, 1, {
+      how: getTopDrawMode(),
+      updateData: { face: 0 },
+      chatNotification: false
+    });
     if (drawnCards[0]) drawn.push(getCardCode(drawnCards[0]));
   }
 
@@ -589,6 +642,23 @@ export const returnJourneyCardsToDeck = async (
   userId: string = game.user?.id ?? ""
 ): Promise<NGHReturnToDeckResult> => {
   return returnCardsFromHandToDeck(cards, userId, "journey");
+};
+
+export const returnDiscardedJokersToDeck = async (cards: string[]): Promise<NGHDeckState> => {
+  const jokerCodes = cards.filter((card): card is string => typeof card === "string" && isJoker(card));
+  if (jokerCodes.length < 1) return getSharedDeckState();
+
+  const { deck, discard } = await ensureDeckInfrastructure();
+  const jokerDocuments = findCardsByCode(discard, jokerCodes);
+  for (const card of jokerDocuments) {
+    await card.recall({ chatNotification: false });
+  }
+
+  if (jokerDocuments.length > 0) {
+    await deck.shuffle({ chatNotification: false });
+  }
+
+  return getSharedDeckState();
 };
 
 export const transferCardsBetweenHands = async (
@@ -693,4 +763,3 @@ export const shuffleAndDealJourneyCards = async (
 
   return dealt;
 };
-

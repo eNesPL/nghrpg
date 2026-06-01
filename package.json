@@ -5,10 +5,12 @@
   "private": true,
   "main": "scripts/ngh-system.js",
   "scripts": {
-    "clean": "rimraf dist scripts templates styles lang system.json",
+    "clean": "rimraf dist",
     "build": "run-s clean build:ts build:assets",
     "build:ts": "tsc -p .",
     "build:assets": "node tools/build-assets.mjs",
+    "deploy": "run-s build deploy:copy",
+    "deploy:copy": "cp dist/system.json . && cp -r dist/scripts dist/templates dist/styles dist/lang .",
     "sync:foundry": "run-s build sync:foundry:files",
     "sync:foundry:files": "node tools/sync-to-foundry.mjs",
     "watch": "run-p watch:ts watch:assets",

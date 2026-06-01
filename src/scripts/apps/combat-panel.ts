@@ -51,7 +51,7 @@ const parseEnemyGroupLine = (line: string): { label: string; groupSize: number; 
     .trim();
 
   return {
-    label: cleanLabel || line.trim() || "Enemy Group",
+    label: cleanLabel || line.trim() || game.i18n?.localize("NGH.Combat.Kind.EnemyGroup") || "Enemy Group",
     groupSize,
     groupAttackBonus
   };
@@ -116,8 +116,12 @@ export class NGHCombatPanel extends foundry.applications.api.HandlebarsApplicati
     classes: ["ngh", "combat-panel-app"],
     tag: "section",
     position: { width: 580, height: 660 },
-    window: { title: "Combat Control", resizable: true },
+    window: { resizable: true },
   };
+
+  override get title(): string {
+    return game.i18n?.localize("NGH.Combat.PanelTitle") ?? "Combat Control";
+  }
 
   static override PARTS = {
     body: {
@@ -361,26 +365,31 @@ export class NGHCombatPanel extends foundry.applications.api.HandlebarsApplicati
       };
     });
 
-    // Apply tie-breaker cards where both sides provided one
-    for (let i = 0; i < newEntries.length - 1; i++) {
-      if (
-        newEntries[i].tied &&
-        newEntries[i + 1].tied &&
-        (newEntries[i].tieBreakerCard || newEntries[i + 1].tieBreakerCard)
-      ) {
-        const tbScore = resolveTieBreaker(
-          newEntries[i].tieBreakerCard,
-          newEntries[i + 1].tieBreakerCard
-        );
-        if (tbScore < 0) {
-          [newEntries[i], newEntries[i + 1]] = [
-            newEntries[i + 1],
-            newEntries[i],
-          ];
-        }
-        if (tbScore !== 0) {
-          newEntries[i].tied = false;
-          newEntries[i + 1].tied = false;
+    // Apply tie-breaker cards — bubble sort so 3+ tied entries are all resolved.
+    let swapped = true;
+    while (swapped) {
+      swapped = false;
+      for (let i = 0; i < newEntries.length - 1; i++) {
+        if (
+          newEntries[i].tied &&
+          newEntries[i + 1].tied &&
+          (newEntries[i].tieBreakerCard || newEntries[i + 1].tieBreakerCard)
+        ) {
+          const tbScore = resolveTieBreaker(
+            newEntries[i].tieBreakerCard,
+            newEntries[i + 1].tieBreakerCard
+          );
+          if (tbScore < 0) {
+            [newEntries[i], newEntries[i + 1]] = [
+              newEntries[i + 1],
+              newEntries[i],
+            ];
+            swapped = true;
+          }
+          if (tbScore !== 0) {
+            newEntries[i].tied = false;
+            newEntries[i + 1].tied = false;
+          }
         }
       }
     }

@@ -51,29 +51,6 @@
       <button type="button" class="action-button" data-action="journey-deal" {{#unless canDealFromCollect}}disabled{{/unless}}>{{localize "NGH.Journey.Action.Deal"}} ({{totalCollected}})</button>
     </div>
 
-    <h3 class="panel-subtitle">{{localize "NGH.Journey.GMHand"}} ({{gmJourneyHand.length}}/{{maxJourneyHandSize}})</h3>
-    <div class="action-toolbar">
-      <button type="button" class="action-button" data-action="draw-journey-card">{{localize "NGH.Action.DrawJourneyCard"}}</button>
-      <button type="button" class="action-button" data-action="play-blind-journey">{{localize "NGH.Action.PlayBlindJourney"}}</button>
-    </div>
-    <div class="hand-list journey-hand-list">
-      {{#if gmJourneyHand.length}}
-        {{#each gmJourneyHand}}
-        <div class="hand-card journey-hand-card">
-          <div class="hand-card__copy">
-            <strong>{{this.code}}</strong>
-            <small>{{this.label}}</small>
-          </div>
-          <div class="hand-card__actions">
-            <button type="button" class="action-button small" data-action="journey-card" data-card="{{this.code}}">{{localize "NGH.Action.Journey"}}</button>
-          </div>
-        </div>
-        {{/each}}
-      {{else}}
-        <p class="empty-note">{{localize "NGH.Journey.EmptyGMHand"}}</p>
-      {{/if}}
-    </div>
-
     <h3 class="panel-subtitle">{{localize "NGH.Journey.PlayerJourneyHands"}}</h3>
     <div class="journey-count-list">
       {{#if playerJourneyCounts.length}}
@@ -81,6 +58,11 @@
         <div class="journey-count-row">
           <strong>{{this.name}}</strong>
           <span>{{localize "NGH.Journey.CardCount" count=this.count}}</span>
+          {{#if this.contributed}}
+            <span>{{localize "NGH.Journey.Contributed"}}</span>
+          {{else}}
+            <span>{{localize "NGH.Journey.NotContributed"}}</span>
+          {{/if}}
         </div>
         {{/each}}
       {{else}}
@@ -170,7 +152,7 @@
     <div class="action-toolbar">
       <button type="button" class="action-button" data-action="journey-reveal-all" {{#unless canRevealAll}}disabled{{/unless}}>{{localize "NGH.Journey.Action.RevealAll"}}</button>
       <button type="button" class="action-button" data-action="journey-auto-resolve" {{#unless canAutoResolve}}disabled{{/unless}}>{{localize "NGH.Journey.Action.AutoResolve"}}</button>
-      <button type="button" class="action-button" data-action="journey-resolve">{{localize "NGH.Journey.Action.Resolve"}}</button>
+      <button type="button" class="action-button" data-action="journey-resolve" {{#unless canResolve}}disabled{{/unless}}>{{localize "NGH.Journey.Action.Resolve"}}</button>
     </div>
   </div>
   {{/if}}

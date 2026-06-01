@@ -1,69 +1,247 @@
 <section class="{{cssClass}} ngh gm-tools-panel">
   <header class="sheet-header gm-tools-panel__header">
-    <h1 class="sheet-title">{{panelTitle}}</h1>
-    <p class="panel-note">{{subtitle}}</p>
+    <div>
+      <h1 class="sheet-title">{{panelTitle}}</h1>
+      <p class="panel-note">{{subtitle}}</p>
+    </div>
+    <div class="gm-screen-searchbar">
+      <div class="gm-screen-search-row">
+        <label class="gm-screen-search" aria-label="{{localize "NGH.GMTools.Search.Label"}}">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input
+            type="search"
+            data-gm-screen-search
+            placeholder="{{localize "NGH.GMTools.Search.Placeholder"}}"
+            autocomplete="off"
+          />
+        </label>
+        <button type="button" class="gm-screen-icon-button" data-action="gm-screen-refresh" title="{{localize "NGH.GMTools.Action.Refresh"}}">
+          <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+        </button>
+      </div>
+      <p class="gm-screen-search-count">
+        {{localize "NGH.GMTools.Search.Results"}}:
+        <strong data-gm-screen-count>0</strong>
+      </p>
+    </div>
   </header>
 
-  <div class="gm-tools-grid">
-    <article class="gm-tools-card">
-      <h2 class="panel-title">{{localize "NGH.GMTools.Section.CorruptionOverview"}}</h2>
-      {{#if hasCorruptionActors}}
-      <div class="gm-tools-corruption-list">
-        {{#each corruptionActors}}
-        <div class="gm-tools-corruption-row">
-          <strong>{{this.name}}</strong>
-          <span>{{localize "NGH.GMTools.Label.Corruption"}}: {{this.corruption}}</span>
+  <div class="gm-screen-layout">
+    <aside class="gm-screen-sidebar" aria-label="{{localize "NGH.GMTools.Section.Session"}}">
+      <article class="gm-tools-card">
+        <h2 class="panel-title">{{localize "NGH.GMTools.Section.CorruptionOverview"}}</h2>
+        {{#if hasCorruptionActors}}
+        <div class="gm-tools-corruption-list">
+          {{#each corruptionActors}}
+          <div class="gm-tools-corruption-row">
+            <strong>{{this.name}}</strong>
+            <span>{{localize "NGH.GMTools.Label.Corruption"}}: {{this.corruption}}</span>
+          </div>
+          {{/each}}
         </div>
-        {{/each}}
-      </div>
-      {{else}}
-      <p class="empty-note">{{localize "NGH.GMTools.Empty.NoCharacters"}}</p>
-      {{/if}}
-    </article>
+        {{else}}
+        <p class="empty-note">{{localize "NGH.GMTools.Empty.NoCharacters"}}</p>
+        {{/if}}
+      </article>
 
-    <article class="gm-tools-card">
-      <h2 class="panel-title">{{localize "NGH.GMTools.Section.CorruptionTriggers"}}</h2>
-      <ul class="gm-tools-list">
-        {{#each corruptionTriggers}}
-        <li>{{this}}</li>
-        {{/each}}
-      </ul>
-    </article>
+      <article class="gm-tools-card">
+        <h2 class="panel-title">{{localize "NGH.GMTools.Section.SessionChecklist"}}</h2>
+        <ul class="gm-tools-list">
+          {{#each sessionChecklist}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </article>
 
-    <article class="gm-tools-card">
-      <h2 class="panel-title">{{localize "NGH.GMTools.Section.JourneyFlow"}}</h2>
-      <ol class="gm-tools-list gm-tools-list--ordered">
-        {{#each journeyFlow}}
-        <li>{{this}}</li>
-        {{/each}}
-      </ol>
-    </article>
+      <article class="gm-tools-card">
+        <h2 class="panel-title">{{localize "NGH.GMTools.Section.QuickReference"}}</h2>
+        <ul class="gm-tools-list">
+          {{#each quickReference}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </article>
 
-    <article class="gm-tools-card">
-      <h2 class="panel-title">{{localize "NGH.GMTools.Section.CombatFlow"}}</h2>
-      <ol class="gm-tools-list gm-tools-list--ordered">
-        {{#each combatFlow}}
-        <li>{{this}}</li>
-        {{/each}}
-      </ol>
-    </article>
+      <article class="gm-tools-card">
+        <h2 class="panel-title">{{localize "NGH.GMTools.Section.JourneyFlow"}}</h2>
+        <ol class="gm-tools-list gm-tools-list--ordered">
+          {{#each journeyFlow}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ol>
+      </article>
 
-    <article class="gm-tools-card">
-      <h2 class="panel-title">{{localize "NGH.GMTools.Section.QuickReference"}}</h2>
-      <ul class="gm-tools-list">
-        {{#each quickReference}}
-        <li>{{this}}</li>
-        {{/each}}
-      </ul>
-    </article>
+      <article class="gm-tools-card">
+        <h2 class="panel-title">{{localize "NGH.GMTools.Section.CombatFlow"}}</h2>
+        <ol class="gm-tools-list gm-tools-list--ordered">
+          {{#each combatFlow}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ol>
+      </article>
 
-    <article class="gm-tools-card">
-      <h2 class="panel-title">{{localize "NGH.GMTools.Section.SessionChecklist"}}</h2>
-      <ul class="gm-tools-list">
-        {{#each sessionChecklist}}
-        <li>{{this}}</li>
-        {{/each}}
-      </ul>
-    </article>
+      <article class="gm-tools-card">
+        <h2 class="panel-title">{{localize "NGH.GMTools.Section.CorruptionTriggers"}}</h2>
+        <ul class="gm-tools-list">
+          {{#each corruptionTriggers}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </article>
+    </aside>
+
+    <main class="gm-screen-main">
+      <section class="gm-screen-state">
+        <header class="gm-screen-rules__header">
+          <h2 class="panel-title">{{localize "NGH.GMTools.Section.CurrentState"}}</h2>
+        </header>
+
+        <div class="gm-screen-state-grid">
+          <article class="gm-screen-state-card">
+            <h3>{{localize "NGH.GMTools.Section.DeckState"}}</h3>
+            <dl class="gm-screen-stat-list">
+              <div><dt>{{localize "NGH.GMTools.Label.JourneyPhase"}}</dt><dd>{{journeyState.phase}}</dd></div>
+              <div><dt>{{localize "NGH.GMTools.Label.Deck"}}</dt><dd>{{journeyState.deckCount}}</dd></div>
+              <div><dt>{{localize "NGH.GMTools.Label.Discard"}}</dt><dd>{{journeyState.discardCount}}</dd></div>
+              <div><dt>{{localize "NGH.GMTools.Label.StandardHands"}}</dt><dd>{{journeyState.standardHandTotal}}</dd></div>
+              <div><dt>{{localize "NGH.GMTools.Label.JourneyHands"}}</dt><dd>{{journeyState.journeyHandTotal}}</dd></div>
+              <div><dt>{{localize "NGH.GMTools.Label.ExtraBlind"}}</dt><dd>{{journeyState.extraBlindCount}}</dd></div>
+            </dl>
+          </article>
+
+          <article class="gm-screen-state-card">
+            <h3>{{localize "NGH.GMTools.Section.JourneyPool"}}</h3>
+            <p class="panel-note">{{localize "NGH.GMTools.Label.PoolCount"}}: <strong>{{journeyState.poolCount}}</strong></p>
+            <div class="gm-screen-card-list">
+              {{#each journeyState.poolCards}}
+              <span class="gm-screen-card-chip {{#if this.isRed}}is-red{{/if}} {{#if this.isJoker}}is-joker{{/if}}" title="{{this.code}}">{{this.label}}</span>
+              {{else}}
+              <span class="empty-note">{{localize "NGH.Common.None"}}</span>
+              {{/each}}
+            </div>
+          </article>
+        </div>
+
+        <section class="gm-screen-character-board">
+          <header class="gm-screen-rules__header">
+            <h2 class="panel-title">{{localize "NGH.GMTools.Section.Characters"}}</h2>
+          </header>
+
+          {{#if hasCharacters}}
+          {{#each characterGroups}}
+          <section class="gm-screen-character-group gm-screen-character-group--{{this.key}}">
+            <header class="gm-screen-character-group__header">
+              <h3>{{this.title}}</h3>
+              <p>{{this.hint}}</p>
+            </header>
+            <div class="gm-screen-character-grid">
+              {{#each this.entries}}
+              <article class="gm-screen-character-card corruption-level--{{this.corruptionClass}}">
+                <header class="gm-screen-character-card__header">
+                  <div>
+                    <h4>{{this.name}}</h4>
+                    <p>{{localize "NGH.GMTools.Label.Player"}}: {{this.userName}}</p>
+                  </div>
+                  <span class="gm-screen-pill gm-screen-pill--{{this.corruptionClass}}">
+                    {{localize "NGH.GMTools.Label.Corruption"}} {{this.corruption}}
+                  </span>
+                </header>
+
+                <div class="gm-screen-character-meta">
+                  <span class="gm-screen-pill gm-screen-pill--{{this.contributionClass}}">
+                    {{#if this.contributed}}
+                    {{localize "NGH.GMTools.Character.Contributed"}}
+                    {{else}}
+                    {{localize "NGH.GMTools.Character.Waiting"}}
+                    {{/if}}
+                  </span>
+                  <span class="gm-screen-pill">
+                    {{localize "NGH.GMTools.Label.CorruptionJourneyCards"}}: {{this.corruptionJourneyCards}}
+                  </span>
+                  <span class="gm-screen-pill">
+                    {{localize "NGH.GMTools.Label.JourneyReveal"}}: {{this.revealLabel}}
+                  </span>
+                </div>
+
+                <div class="gm-screen-attribute-list">
+                  {{#each this.attributes}}
+                  <span class="gm-screen-attribute {{#if this.damaged}}is-damaged{{/if}}">
+                    {{this.label}} {{this.value}}/{{this.max}}
+                  </span>
+                  {{/each}}
+                </div>
+
+                <div class="gm-screen-hand-section">
+                  <h5>{{localize "NGH.GMTools.Label.StandardHand"}} ({{this.standardCards.length}}/{{@root.journeyState.maxHandSize}})</h5>
+                  <div class="gm-screen-card-list">
+                  {{#each this.standardCards}}
+                  <span class="gm-screen-card-chip {{#if this.isRed}}is-red{{/if}} {{#if this.isJoker}}is-joker{{/if}}" title="{{this.code}}">{{this.label}}</span>
+                  {{else}}
+                  <span class="empty-note">{{localize "NGH.Common.None"}}</span>
+                  {{/each}}
+                </div>
+              </div>
+
+                <div class="gm-screen-hand-section">
+                  <h5>{{localize "NGH.GMTools.Label.JourneyHand"}} ({{this.journeyCards.length}}/{{@root.journeyState.maxJourneyHandSize}})</h5>
+                  <div class="gm-screen-card-list">
+                    {{#each this.journeyCards}}
+                    <span class="gm-screen-card-chip {{#if this.isRed}}is-red{{/if}} {{#if this.isJoker}}is-joker{{/if}}" title="{{this.code}}">{{this.label}}</span>
+                    {{else}}
+                    <span class="empty-note">{{localize "NGH.Common.None"}}</span>
+                    {{/each}}
+                  </div>
+                </div>
+
+                {{#unless this.hasUser}}
+                <p class="empty-note">{{localize "NGH.GMTools.Character.AssignHint"}}</p>
+                {{/unless}}
+              </article>
+              {{/each}}
+            </div>
+          </section>
+          {{/each}}
+          {{else}}
+          <p class="empty-note">{{localize "NGH.GMTools.Empty.NoCharacters"}}</p>
+          {{/if}}
+        </section>
+      </section>
+
+      <section class="gm-screen-rules">
+      <header class="gm-screen-rules__header">
+        <h2 class="panel-title">{{localize "NGH.GMTools.Section.Rules"}}</h2>
+      </header>
+
+      <p class="empty-note gm-screen-empty" data-gm-screen-empty hidden>
+        {{localize "NGH.GMTools.Search.NoResults"}}
+      </p>
+
+      {{#each ruleSections}}
+      <section class="gm-screen-section" data-gm-rule-section>
+        <h3>{{this.title}}</h3>
+        <div class="gm-screen-rule-grid">
+          {{#each this.entries}}
+          <article class="gm-screen-rule-card" data-gm-rule-card data-search="{{this.searchText}}">
+            <header class="gm-screen-rule-card__header">
+              <h4>{{this.title}}</h4>
+              <span class="gm-screen-source">{{localize "NGH.GMTools.Label.Source"}} {{this.source}}</span>
+            </header>
+            <div class="gm-screen-tags">
+              {{#each this.tags}}
+              <span class="gm-screen-tag">{{this}}</span>
+              {{/each}}
+            </div>
+            <ul class="gm-tools-list">
+              {{#each this.rules}}
+              <li>{{this}}</li>
+              {{/each}}
+            </ul>
+          </article>
+          {{/each}}
+        </div>
+      </section>
+      {{/each}}
+      </section>
+    </main>
   </div>
 </section>

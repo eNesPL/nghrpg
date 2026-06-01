@@ -1,4 +1,5 @@
 const NGH_SYSTEM_ID = "nghrpg";
+const JOURNEY_PHASE_SETTING = "journeyPhase";
 const JOURNEY_POOL_SETTING = "journeyPoolCards";
 const JOURNEY_PLAYED_USERS_SETTING = "journeyPlayedUsers";
 export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
@@ -72,9 +73,16 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         const userId = game.user?.id ?? "";
         const hand = api?.mechanics.cards.getHand(userId) ?? [];
         const journeyHand = api?.mechanics.cards.getJourneyHand(userId) ?? [];
-        const parsedHand = hand.map((card) => api?.mechanics.cards.parse(card) ?? { code: card, label: card, suit: "", rank: "", score: 0 });
+        const parsedHand = hand.map((card) => {
+            const parsed = api?.mechanics.cards.parse(card) ?? { code: card, label: card, suit: "", rank: "", score: 0 };
+            const isRed = parsed.suit === "H" || parsed.suit === "D" || parsed.suit === "R";
+            return { ...parsed, suitColor: isRed ? "red" : "black" };
+        });
         const parsedJourneyHand = journeyHand.map((card) => api?.mechanics.cards.parse(card) ?? { code: card, label: card, suit: "", rank: "", score: 0 });
         const weaponProfiles = Object.values(api?.mechanics.combat.weapons ?? {});
+        const journeyPhase = String(game.settings?.get(NGH_SYSTEM_ID, JOURNEY_PHASE_SETTING) ?? "configure");
+        const canPlayJourneyCards = journeyPhase === "collect";
+        const hasContributedToJourney = this.getJourneyPlayedUserIds().includes(userId);
         return {
             actor: this.actor,
             system: this.actor.system,
@@ -86,6 +94,8 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
             journeyHand: parsedJourneyHand,
             maxHandSize: api?.mechanics.cards.maxHandSize() ?? 7,
             maxJourneyHandSize: api?.mechanics.cards.maxJourneyHandSize() ?? 7,
+            canPlayJourneyCards,
+            canPlayBlindJourney: canPlayJourneyCards && hand.length === 0 && !hasContributedToJourney,
             weaponProfiles,
         };
     }
@@ -178,6 +188,9 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         root.querySelector("[data-action='ally-black-card-corruption']")?.addEventListener("click", () => {
             run(() => this._doAllyBlackCardCorruption());
         });
+        root.querySelector("[data-action='grove-corruption']")?.addEventListener("click", () => {
+            run(() => this._doGroveCorruption());
+        });
         root.querySelector("[data-action='gm-corruption-incident']")?.addEventListener("click", () => {
             run(() => this._doGMCorruptionIncident());
         });
@@ -218,11 +231,40 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
             throw new Error(this.t("NGH.Error.MissingActiveUser", "Missing active user"));
         return userId;
     }
-    async createChatMessage(title, lines) {
-        await ChatMessage.create({
+    getJourneyPlayedUserIds() {
+        const raw = String(game.settings?.get(NGH_SYSTEM_ID, JOURNEY_PLAYED_USERS_SETTING) ?? "[]");
+        try {
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed)
+                ? parsed.filter((value) => typeof value === "string" && value.length > 0)
+                : [];
+        }
+        catch {
+            return [];
+        }
+    }
+    getCorruptionWhisperRecipients() {
+        return this.getPrivateWhisperRecipients();
+    }
+    getPrivateWhisperRecipients(userId = game.user?.id ?? "") {
+        const recipients = new Set();
+        const gmRecipients = (ChatMessage.getWhisperRecipients?.("GM") ?? []);
+        for (const recipient of gmRecipients) {
+            if (recipient?.id)
+                recipients.add(String(recipient.id));
+        }
+        if (userId)
+            recipients.add(userId);
+        return [...recipients];
+    }
+    async createChatMessage(title, lines, options = {}) {
+        const messageData = {
             speaker: ChatMessage.getSpeaker({ actor: this.actor }),
             content: [`<h3>${title}</h3>`, ...lines.map((line) => `<p>${line}</p>`)].join(""),
-        });
+        };
+        if (options.whisper?.length)
+            messageData.whisper = options.whisper;
+        await ChatMessage.create(messageData);
     }
     escapeHtml(value) {
         return value
@@ -319,7 +361,7 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
               <th style="padding:4px 8px; text-align:center;">${this.t("NGH.PostRoll.Table.Index", "Index")}</th>
               <th style="padding:4px 8px; text-align:center;">${this.t("NGH.PostRoll.Table.Roll", "Roll")}</th>
               <th style="padding:4px 8px; text-align:center;">${this.t("NGH.PostRoll.Table.Reroll", "Reroll")}</th>
-              <th style="padding:4px 8px; text-align:center;">+1</th>
+              <th style="padding:4px 8px; text-align:center;">${this.t("NGH.PostRoll.Table.IncreaseBonus", "+1")}</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -411,6 +453,59 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
             return null;
         return result;
     }
+    async _promptKeepCard(cards) {
+        const rows = cards
+            .map((card) => {
+            const parsed = this.api.mechanics.cards.parse(card);
+            const isRed = parsed.suit === "H" || parsed.suit === "D" || parsed.suit === "R";
+            const color = isRed ? "#aa2222" : "#222";
+            return `<tr>
+          <td style="padding:4px 8px;"><input type="radio" name="card" value="${card}" ${card === cards[0] ? "checked" : ""} /></td>
+          <td style="padding:4px 8px; color:${color};">${parsed.label}</td>
+        </tr>`;
+        })
+            .join("");
+        const result = await foundry.applications.api.DialogV2.prompt({
+            window: { title: this.t("NGH.Advancement.ChooseCardToKeep", "Choose card to keep") },
+            content: `<form class="ngh-dialog">
+        <p>${this.t("NGH.Advancement.ChooseCardToKeepHint", "All selected cards are the same color — choose which card to keep (it will not be spent):")}</p>
+        <table style="width:100%; border-collapse:collapse;">
+          <thead><tr>
+            <th style="padding:4px 8px;">${this.t("NGH.Advancement.Keep", "Keep")}</th>
+            <th style="padding:4px 8px;">${this.t("NGH.Advancement.Card", "Card")}</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </form>`,
+            ok: {
+                label: game.i18n?.localize("OK") ?? "OK",
+                callback: (_event, _button, dialog) => {
+                    const root = this.getDialogRoot(dialog);
+                    const checked = root?.querySelector("input[name='card']:checked");
+                    return checked?.value ?? null;
+                },
+            },
+            rejectClose: false,
+        });
+        if (!result || typeof result !== "string")
+            return null;
+        return result;
+    }
+    _wouldGetSameColorDiscount(cards, baseCost) {
+        if (cards.length < baseCost)
+            return false;
+        const getColor = (card) => {
+            if (card === "RJ")
+                return "red";
+            if (card === "BJ")
+                return "black";
+            const suit = card.slice(-1);
+            return suit === "H" || suit === "D" ? "red" : "black";
+        };
+        const firstBatch = cards.slice(0, baseCost);
+        const color = getColor(firstBatch[0]);
+        return firstBatch.every((c) => getColor(c) === color);
+    }
     async _doAdvanceAttribute(attributeKey) {
         const system = this.actor.system;
         const attr = system.attributes?.[attributeKey];
@@ -429,16 +524,26 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         const selectedCards = await this.promptCardSelection(this.t("NGH.Advancement.AdvanceAttribute", "Advance Attribute"), hint, hand);
         if (!selectedCards)
             return;
-        const result = await this.api.mechanics.cards.spendForAdvancement(selectedCards, "attribute", currentMax, 0, this.userId);
+        let keptCard;
+        if (this._wouldGetSameColorDiscount(selectedCards, baseCost)) {
+            const chosen = await this._promptKeepCard(selectedCards.slice(0, baseCost));
+            if (!chosen)
+                return;
+            keptCard = chosen;
+        }
+        const result = await this.api.mechanics.cards.spendForAdvancement(selectedCards, "attribute", currentMax, 0, this.userId, keptCard);
         const newMax = currentMax + 1 + result.effectBonus;
         await this.actor.update({ [`system.attributes.${attributeKey}.max`]: newMax });
         void this.render();
         await this.createChatMessage(this.t("NGH.Chat.Advancement.Title", "Advancement"), [
             this.tf("NGH.Chat.Advancement.Attribute", { attr: attributeKey, from: currentMax, to: newMax }, `${attributeKey}: ${currentMax} → ${newMax}`),
             this.tf("NGH.Chat.Advancement.Spent", { cards: result.cards.join(", ") }, `Spent: ${result.cards.join(", ")}`),
-            result.sameColorDiscount ? this.t("NGH.Chat.Advancement.SameColor", "Same color — 1 card kept.") : "",
+            result.sameColorDiscount && result.keptCard ? this.tf("NGH.Chat.Advancement.SameColorKept", { card: result.keptCard }, `Same color — kept: ${result.keptCard}`) : "",
             result.effectBonus > 0 ? this.t("NGH.Chat.Advancement.FacesBonus", "All faces/aces — effect +1!") : "",
-        ].filter(Boolean));
+        ].filter(Boolean), { whisper: this.getPrivateWhisperRecipients(this.userId) });
+        if (result.triggersCorruptionRisk) {
+            await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.BlackJokerAdvancement", "Black Joker — Advancement"));
+        }
     }
     async _doAdvanceSkill(skillKey) {
         const system = this.actor.system;
@@ -455,16 +560,26 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
             const selectedCards = await this.promptCardSelection(this.t("NGH.Advancement.AcquireSkill", "Acquire Skill"), hint, hand);
             if (!selectedCards)
                 return;
-            const result = await this.api.mechanics.cards.spendForAdvancement(selectedCards, "new-skill", 0, alreadyBought, this.userId);
+            let keptCard;
+            if (this._wouldGetSameColorDiscount(selectedCards, baseCost)) {
+                const chosen = await this._promptKeepCard(selectedCards.slice(0, baseCost));
+                if (!chosen)
+                    return;
+                keptCard = chosen;
+            }
+            const result = await this.api.mechanics.cards.spendForAdvancement(selectedCards, "new-skill", 0, alreadyBought, this.userId, keptCard);
             const newRank = result.effectBonus;
             await this.actor.update({ [`system.skills.${skillKey}.trained`]: true, [`system.skills.${skillKey}.rank`]: newRank });
             void this.render();
             await this.createChatMessage(this.t("NGH.Chat.Advancement.Title", "Advancement"), [
                 this.tf("NGH.Chat.Advancement.NewSkill", { skill: skillKey, rank: newRank }, `New skill: ${skillKey} (rank ${newRank})`),
                 this.tf("NGH.Chat.Advancement.Spent", { cards: result.cards.join(", ") }, `Spent: ${result.cards.join(", ")}`),
-                result.sameColorDiscount ? this.t("NGH.Chat.Advancement.SameColor", "Same color — 1 card kept.") : "",
+                result.sameColorDiscount && result.keptCard ? this.tf("NGH.Chat.Advancement.SameColorKept", { card: result.keptCard }, `Same color — kept: ${result.keptCard}`) : "",
                 result.effectBonus > 0 ? this.t("NGH.Chat.Advancement.FacesBonus", "Faces/aces — starts at rank 1!") : "",
-            ].filter(Boolean));
+            ].filter(Boolean), { whisper: this.getPrivateWhisperRecipients(this.userId) });
+            if (result.triggersCorruptionRisk) {
+                await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.BlackJokerAdvancement", "Black Joker — Advancement"));
+            }
             return;
         }
         const currentRank = Number(skill.rank ?? 0);
@@ -478,16 +593,26 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         const selectedCards = await this.promptCardSelection(this.t("NGH.Advancement.AdvanceSkill", "Advance Skill"), hint, hand);
         if (!selectedCards)
             return;
-        const result = await this.api.mechanics.cards.spendForAdvancement(selectedCards, "skill-die", currentRank, 0, this.userId);
+        let keptCard;
+        if (this._wouldGetSameColorDiscount(selectedCards, baseCost)) {
+            const chosen = await this._promptKeepCard(selectedCards.slice(0, baseCost));
+            if (!chosen)
+                return;
+            keptCard = chosen;
+        }
+        const result = await this.api.mechanics.cards.spendForAdvancement(selectedCards, "skill-die", currentRank, 0, this.userId, keptCard);
         const newRank = Math.min(5, currentRank + 1 + result.effectBonus);
         await this.actor.update({ [`system.skills.${skillKey}.rank`]: newRank });
         void this.render();
         await this.createChatMessage(this.t("NGH.Chat.Advancement.Title", "Advancement"), [
             this.tf("NGH.Chat.Advancement.Skill", { skill: skillKey, from: currentRank, to: newRank }, `${skillKey}: rank ${currentRank} → ${newRank}`),
             this.tf("NGH.Chat.Advancement.Spent", { cards: result.cards.join(", ") }, `Spent: ${result.cards.join(", ")}`),
-            result.sameColorDiscount ? this.t("NGH.Chat.Advancement.SameColor", "Same color — 1 card kept.") : "",
+            result.sameColorDiscount && result.keptCard ? this.tf("NGH.Chat.Advancement.SameColorKept", { card: result.keptCard }, `Same color — kept: ${result.keptCard}`) : "",
             result.effectBonus > 0 ? this.t("NGH.Chat.Advancement.FacesBonus", "All faces/aces — effect +1!") : "",
-        ].filter(Boolean));
+        ].filter(Boolean), { whisper: this.getPrivateWhisperRecipients(this.userId) });
+        if (result.triggersCorruptionRisk) {
+            await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.BlackJokerAdvancement", "Black Joker — Advancement"));
+        }
     }
     async _doAdvanceWhisper(whisperKey) {
         const system = this.actor.system;
@@ -506,16 +631,26 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         const selectedCards = await this.promptCardSelection(this.t("NGH.Advancement.AdvanceWhisper", "Advance Whisper Path"), hint, hand);
         if (!selectedCards)
             return;
-        const result = await this.api.mechanics.cards.spendForAdvancement(selectedCards, "skill-die", currentRank, 0, this.userId);
+        let keptCard;
+        if (this._wouldGetSameColorDiscount(selectedCards, baseCost)) {
+            const chosen = await this._promptKeepCard(selectedCards.slice(0, baseCost));
+            if (!chosen)
+                return;
+            keptCard = chosen;
+        }
+        const result = await this.api.mechanics.cards.spendForAdvancement(selectedCards, "skill-die", currentRank, 0, this.userId, keptCard);
         const newRank = Math.min(5, currentRank + 1 + result.effectBonus);
         await this.actor.update({ [`system.whispers.${whisperKey}.rank`]: newRank });
         void this.render();
         await this.createChatMessage(this.t("NGH.Chat.Advancement.Title", "Advancement"), [
             this.tf("NGH.Chat.Advancement.Whisper", { path: pathName, from: currentRank, to: newRank }, `Whisper ${pathName}: rank ${currentRank} → ${newRank}`),
             this.tf("NGH.Chat.Advancement.Spent", { cards: result.cards.join(", ") }, `Spent: ${result.cards.join(", ")}`),
-            result.sameColorDiscount ? this.t("NGH.Chat.Advancement.SameColor", "Same color — 1 card kept.") : "",
+            result.sameColorDiscount && result.keptCard ? this.tf("NGH.Chat.Advancement.SameColorKept", { card: result.keptCard }, `Same color — kept: ${result.keptCard}`) : "",
             result.effectBonus > 0 ? this.t("NGH.Chat.Advancement.FacesBonus", "All faces/aces — effect +1!") : "",
-        ].filter(Boolean));
+        ].filter(Boolean), { whisper: this.getPrivateWhisperRecipients(this.userId) });
+        if (result.triggersCorruptionRisk) {
+            await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.BlackJokerAdvancement", "Black Joker — Advancement"));
+        }
         if (newRank >= 3) {
             await this._doCorruptionRiskCheck(this.tf("NGH.CorruptionRisk.Reason.WhisperAdvancement", { path: pathName, rank: newRank }, `Whisper ${pathName} advanced to rank ${newRank}`));
         }
@@ -565,6 +700,12 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         const preview = this.api.mechanics.executeSkillTest(baseOptions);
         const post = await this.promptPostRollModifiers(preview.rollsBeforePost, preview.modifiers.remaining);
         const result = this.api.mechanics.executeSkillTest({ ...baseOptions, rerollIndices: post.rerollIndices, increaseIndices: post.increaseIndices }, this.createReplayRng(preview.rollsBeforePost));
+        const sacrificeNote = await this.promptText(this.t("NGH.Whisper.Cast.SacrificePrompt", "Additional sacrifice or path-specific cost notes (leave blank if none):"), "");
+        if (sacrificeNote === null)
+            return;
+        const effectNote = await this.promptText(this.t("NGH.Whisper.Cast.EffectPrompt", "Manual effect / outcome notes (leave blank if not resolved now):"), "");
+        if (effectNote === null)
+            return;
         // Steps 4+5: Post combined chat message
         const chatLines = [
             this.tf("NGH.Chat.WhisperCast.Path", { path: pathName }, `Path: ${pathName}`),
@@ -572,11 +713,15 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         if (spellName.trim()) {
             chatLines.push(this.tf("NGH.Chat.WhisperCast.Spell", { spell: spellName.trim() }, `Spell: ${spellName.trim()}`));
         }
-        chatLines.push(this.tf("NGH.Chat.WhisperCast.CostCard", { card: costCard }, `Cost paid: ${costCard}`), burnResult.triggersCorruptionRisk
-            ? this.t("NGH.Chat.WhisperCast.BurnBlack", "Black Joker burned — Corruption Risk triggered!")
+        chatLines.push(this.t("NGH.Chat.WhisperCast.CostPaidHidden", "Card cost paid privately."), burnResult.triggersCorruptionRisk
+            ? this.t("NGH.Chat.WhisperCast.CorruptionRiskPrivate", "Corruption risk resolved privately.")
             : "", this.tf("NGH.Chat.SkillTest.Attribute", { attribute: attributeKey }, `Attribute: ${attributeKey}`), this.tf("NGH.Chat.SkillTest.RollsFinal", { rolls: result.rollsAfterPost.join(", ") }, `Rolls: ${result.rollsAfterPost.join(", ")}`), this.tf("NGH.Chat.SkillTest.Successes", { successes: result.successes, difficulty }, `Successes: ${result.successes}/${difficulty}`), result.passed
             ? this.t("NGH.Chat.Result.Success", "Result: success")
-            : this.t("NGH.Chat.WhisperCast.Failed", "Result: failure — consider additional sacrifice (path-specific)."));
+            : this.t("NGH.Chat.WhisperCast.Failed", "Result: failure — consider additional sacrifice (path-specific)."), sacrificeNote.trim()
+            ? this.tf("NGH.Chat.WhisperCast.Sacrifice", { sacrifice: sacrificeNote.trim() }, `Additional sacrifice: ${sacrificeNote.trim()}`)
+            : this.t("NGH.Chat.WhisperCast.SacrificeNone", "Additional sacrifice: none recorded."), effectNote.trim()
+            ? this.tf("NGH.Chat.WhisperCast.ManualEffect", { effect: effectNote.trim() }, `Manual effect: ${effectNote.trim()}`)
+            : this.t("NGH.Chat.WhisperCast.ManualEffectPending", "Manual effect: resolve from path text / GM ruling."));
         await this.createChatMessage(this.t("NGH.Chat.WhisperCast.Title", "Whisper Cast"), chatLines.filter(Boolean));
         if (burnResult.triggersCorruptionRisk) {
             await this._doCorruptionRiskCheck(this.tf("NGH.CorruptionRisk.Reason.WhisperBurn", { path: pathName }, `Whisper burn — Black Joker (${pathName})`));
@@ -597,7 +742,9 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
                 ? this.t("NGH.Chat.CorruptionRisk.Black", "Black card — Corruption +1")
                 : this.t("NGH.Chat.CorruptionRisk.Red", "Red card — no corruption."),
         ];
-        await this.createChatMessage(this.t("NGH.Chat.CorruptionRisk.Title", "Corruption Risk"), lines);
+        await this.createChatMessage(this.t("NGH.Chat.CorruptionRisk.Title", "Corruption Risk"), lines, {
+            whisper: this.getCorruptionWhisperRecipients()
+        });
         void this.render();
     }
     async _doElementalRitual() {
@@ -622,9 +769,13 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
                     : this.t("NGH.Chat.ElementalRitual.Red", "Red card — no corruption risk."))
                 : this.t("NGH.Chat.ElementalRitual.FromHand", "Cost paid from hand."));
         }
-        await this.createChatMessage(this.t("NGH.Chat.ElementalRitual.Title", "Elemental Ritual"), lines);
+        await this.createChatMessage(this.t("NGH.Chat.ElementalRitual.Title", "Elemental Ritual"), lines, {
+            whisper: this.getPrivateWhisperRecipients(this.userId)
+        });
         if (result.triggersCorruptionRisk) {
-            await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.ElementalRitual", "Elemental Ritual — no cards in hand"));
+            await this._doCorruptionRiskCheck(result.source === "hand" && result.card === "BJ"
+                ? this.t("NGH.CorruptionRisk.Reason.BlackJokerElementalRitual", "Black Joker — Elemental Ritual")
+                : this.t("NGH.CorruptionRisk.Reason.ElementalRitual", "Elemental Ritual — no cards in hand"));
         }
         void this.render();
     }
@@ -663,11 +814,14 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         }
         await this.createChatMessage(this.t("NGH.Chat.OfficerShare.Title", "Officer — Cards Shared"), drawn.length > 0
             ? drawn.map(({ userName, card }) => this.tf("NGH.Chat.OfficerShare.Card", { user: userName, card }, `${userName}: ${card}`))
-            : [this.t("NGH.Chat.OfficerShare.NoneDrawn", "No cards could be drawn from the deck.")]);
+            : [this.t("NGH.Chat.OfficerShare.NoneDrawn", "No cards could be drawn from the deck.")], { whisper: this.getPrivateWhisperRecipients(this.userId) });
         void this.render();
     }
     async _doAllyBlackCardCorruption() {
         await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.StarsHolyDay", "Stars / Holy Day — ally black card"));
+    }
+    async _doGroveCorruption() {
+        await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.Grove", "Grove — cards left on the table"));
     }
     async _doGMCorruptionIncident() {
         if (!game.user?.isGM) {
@@ -688,7 +842,7 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         await this.createChatMessage(this.t("NGH.Chat.DrawCard.Title", "Draw Card"), [
             this.tf("NGH.Chat.DrawCard.Drawn", { drawn: result.drawn.join(", ") || this.t("NGH.Common.None", "none") }, `Drawn: ${result.drawn.join(", ") || "none"}`),
             this.tf("NGH.Chat.DrawCard.Hand", { current: result.hand.length, max: this.api.mechanics.cards.maxHandSize() }, `Hand: ${result.hand.length}/${this.api.mechanics.cards.maxHandSize()}`),
-        ]);
+        ], { whisper: this.getPrivateWhisperRecipients(this.userId) });
     }
     async _doDrawJourneyCard() {
         const result = await this.api.mechanics.cards.drawJourney(this.userId, 1);
@@ -696,7 +850,7 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         await this.createChatMessage(this.t("NGH.Chat.DrawJourneyCard.Title", "Draw Journey Card"), [
             this.tf("NGH.Chat.DrawJourneyCard.Drawn", { drawn: result.drawn.join(", ") || this.t("NGH.Common.None", "none") }, `Drawn: ${result.drawn.join(", ") || "none"}`),
             this.tf("NGH.Chat.DrawJourneyCard.Hand", { current: result.hand.length, max: this.api.mechanics.cards.maxJourneyHandSize() }, `Journey hand: ${result.hand.length}/${this.api.mechanics.cards.maxJourneyHandSize()}`),
-        ]);
+        ], { whisper: this.getPrivateWhisperRecipients(this.userId) });
     }
     async _doDiscardCard(card) {
         if (!card)
@@ -706,7 +860,7 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         await this.createChatMessage(this.t("NGH.Chat.DiscardCard.Title", "Discard Card"), [
             this.tf("NGH.Chat.DiscardCard.Discarded", { card }, `Discarded: ${card}`),
             this.tf("NGH.Chat.DiscardCard.HandLeft", { count: result.hand.length }, `Cards left in hand: ${result.hand.length}`),
-        ]);
+        ], { whisper: this.getPrivateWhisperRecipients(this.userId) });
     }
     async _doInitiativeCard(card) {
         if (!card)
@@ -725,6 +879,9 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         }
     }
     async _doJourneyCard(card) {
+        if (!card && this.getJourneyPlayedUserIds().includes(this.userId)) {
+            throw new Error(this.t("NGH.Error.JourneyBlindAlreadyContributed", "You already contributed to this Journey. Extra blind cards must be added from the Journey panel."));
+        }
         const result = await this.api.mechanics.cards.useJourney(this.userId, card);
         const played = (result.playedCards ?? []).filter((value) => typeof value === "string");
         if (played.length > 0) {
@@ -758,14 +915,11 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
             }
         }
         await this.createChatMessage(this.t("NGH.Chat.Journey.Title", "Journey"), [
-            this.tf("NGH.Chat.Journey.Source", { source: result.source }, `Source: ${result.source}`),
-            this.tf(result.source === "top-deck" ? "NGH.Chat.Journey.DrewBlind" : "NGH.Chat.Journey.Played", { card: result.playedCards[0] ?? this.t("NGH.Common.None", "none") }, `${result.source === "top-deck" ? "Drew blind" : "Played"}: ${result.playedCards[0] ?? "none"}`),
-            this.tf("NGH.Chat.Journey.HandLeft", { count: result.hand.length }, `Journey hand left: ${result.hand.length}`),
+            result.source === "top-deck"
+                ? this.t("NGH.Chat.Journey.DrewBlindHidden", "A blind card was added to the Journey.")
+                : this.t("NGH.Chat.Journey.PlayedHidden", "A card was added to the Journey."),
         ]);
         void this.render();
-        if (result.triggersCorruptionRisk) {
-            await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.BlackJokerJourney", "Black Joker — Journey"));
-        }
     }
     async _doBurnCard(card, reason) {
         if (!card)
@@ -778,7 +932,7 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
             : this.t("NGH.Chat.BurnWhisper.Title", "Burn Card for Whisper"), [
             this.tf("NGH.Chat.BurnCard.Burned", { cards: result.cards.join(", ") }, `Burned: ${result.cards.join(", ")}`),
             this.tf("NGH.Chat.BurnCard.HandRemaining", { count: result.hand.length }, `Remaining hand: ${result.hand.length}`),
-        ]);
+        ], { whisper: this.getPrivateWhisperRecipients(this.userId) });
         void this.render();
         if (result.triggersCorruptionRisk) {
             await this._doCorruptionRiskCheck(reason === "plus-one"
@@ -797,7 +951,7 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         await this.createChatMessage(this.t("NGH.Chat.Heal.Title", "Heal Attribute"), [
             this.tf("NGH.Chat.Heal.Burned", { card }, `Burned: ${card}`),
             this.tf("NGH.Chat.Heal.Recovered", { attribute, current: result.current, max: result.max }, `Recovered ${attribute} to ${result.current}/${result.max}`),
-        ]);
+        ], { whisper: this.getPrivateWhisperRecipients(this.userId) });
         void this.render();
         if (burnResult.triggersCorruptionRisk) {
             await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.BlackJokerBurnHeal", "Black Joker — Burn for Healing"));
@@ -821,8 +975,11 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
             this.tf("NGH.Chat.Defend.Prevented", { prevented: result.preventedDamage }, `Prevented: ${result.preventedDamage}`),
             this.tf("NGH.Chat.Defend.Applied", { applied: result.appliedDamage }, `Applied: ${result.appliedDamage}`),
             this.tf("NGH.Chat.Defend.Current", { current: result.current, max: result.max }, `Current: ${result.current}/${result.max}`),
-        ]);
+        ], { whisper: this.getPrivateWhisperRecipients(this.userId) });
         void this.render();
+        if (result.triggersCorruptionRisk) {
+            await this._doCorruptionRiskCheck(this.t("NGH.CorruptionRisk.Reason.BlackJokerDefense", "Black Joker — Defense"));
+        }
     }
     async _doSkillTest(skill) {
         if (!skill)

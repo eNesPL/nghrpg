@@ -20,6 +20,8 @@ export interface NGHDamageApplicationResult extends NGHAttributeUpdateResult {
   incomingDamage: number;
   appliedDamage: number;
   preventedDamage: number;
+  burnedCards?: string[];
+  triggersCorruptionRisk?: boolean;
 }
 
 const clampInt = (value: number, min = 0): number => {
@@ -131,9 +133,11 @@ export const preventDamageWithCards = async (
   const damage = clampInt(incomingDamage, 0);
   const usableCards = cards.slice(0, damage);
   const preventedDamage = usableCards.length;
+  let triggersCorruptionRisk = false;
 
   if (usableCards.length > 0) {
-    await burnCardsForHealing(usableCards, userId);
+    const burnResult = await burnCardsForHealing(usableCards, userId);
+    triggersCorruptionRisk = burnResult.triggersCorruptionRisk;
   }
 
   const remainingDamage = Math.max(0, damage - preventedDamage);
@@ -144,6 +148,8 @@ export const preventDamageWithCards = async (
     incomingDamage: damage,
     preventedDamage,
     appliedDamage: remainingDamage,
-    changedBy: -remainingDamage
+    changedBy: -remainingDamage,
+    burnedCards: usableCards,
+    triggersCorruptionRisk
   };
 };

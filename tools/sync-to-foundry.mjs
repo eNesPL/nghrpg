@@ -5,13 +5,14 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "..");
+const distRoot = path.join(projectRoot, "dist");
 const defaultTargetRoot = "C:\\Users\\kliza\\AppData\\Local\\FoundryVTT\\Data\\systems\\nghrpg";
 const targetRoot = process.env.NGH_FOUNDRY_TARGET?.trim() || defaultTargetRoot;
 
-const runtimeEntries = ["system.json", "scripts", "templates", "styles", "lang", "src"];
+const runtimeEntries = ["system.json", "scripts", "templates", "styles", "lang", "packs"];
 
 const sourceSystemManifest = path.join(projectRoot, "src", "system.json");
-const runtimeSystemManifest = path.join(projectRoot, "system.json");
+const distSystemManifest = path.join(distRoot, "system.json");
 
 const bumpPatchVersion = (version) => {
   const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(String(version).trim());
@@ -32,7 +33,7 @@ const bumpSystemManifestVersions = async () => {
 
   sourceManifest.version = nextVersion;
   await writeFile(sourceSystemManifest, `${JSON.stringify(sourceManifest, null, 2)}\n`, "utf8");
-  await writeFile(runtimeSystemManifest, `${JSON.stringify(sourceManifest, null, 2)}\n`, "utf8");
+  await writeFile(distSystemManifest, `${JSON.stringify(sourceManifest, null, 2)}\n`, "utf8");
 
   return nextVersion;
 };
@@ -47,7 +48,7 @@ const getRealPathOrNull = async (targetPath) => {
 
 const ensureRuntimeExists = async () => {
   for (const entry of runtimeEntries) {
-    const entryPath = path.join(projectRoot, entry);
+    const entryPath = path.join(distRoot, entry);
     const resolved = await getRealPathOrNull(entryPath);
     if (!resolved) {
       throw new Error(`Runtime entry is missing: ${entryPath}. Run the build first.`);
@@ -56,7 +57,7 @@ const ensureRuntimeExists = async () => {
 };
 
 const syncEntry = async (entry) => {
-  const sourcePath = path.join(projectRoot, entry);
+  const sourcePath = path.join(distRoot, entry);
   const targetPath = path.join(targetRoot, entry);
   await rm(targetPath, { recursive: true, force: true });
   await cp(sourcePath, targetPath, { recursive: true, force: true });
@@ -66,7 +67,7 @@ const syncToFoundry = async () => {
   const syncedVersion = await bumpSystemManifestVersions();
   await ensureRuntimeExists();
 
-  const sourceRootReal = await realpath(projectRoot);
+  const sourceRootReal = await realpath(distRoot);
   const targetRootReal = await getRealPathOrNull(targetRoot);
 
   if (targetRootReal && targetRootReal === sourceRootReal) {
