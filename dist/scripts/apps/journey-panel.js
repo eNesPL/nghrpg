@@ -149,6 +149,59 @@ export const handleJourneySocketMessage = (data) => {
         }
     }
 };
+/**
+ * GM-side socket handler. Players cannot write world-scoped settings, so they
+ * emit a "journeyContribute" socket message instead. The GM processes it here
+ * and updates the shared world settings, then broadcasts a re-render event.
+ */
+export const handleJourneySocketMessageAsGM = async (data) => {
+    if (!game.user?.isGM)
+        return;
+    if (!data || typeof data !== "object")
+        return;
+    const msg = data;
+    if (msg.type === "journeyContribute") {
+        const userId = typeof msg.userId === "string" ? msg.userId : null;
+        const cards = Array.isArray(msg.cards)
+            ? msg.cards.filter((c) => typeof c === "string")
+            : [];
+        if (!userId || cards.length === 0)
+            return;
+        // Update the journey pool
+        const rawPool = String(game.settings?.get(NGH_SYSTEM_ID, JOURNEY_POOL_SETTING) ?? "[]");
+        let pool = [];
+        try {
+            const parsedPool = JSON.parse(rawPool);
+            if (Array.isArray(parsedPool))
+                pool = parsedPool.filter((c) => typeof c === "string");
+        }
+        catch {
+            pool = [];
+        }
+        pool.push(...cards);
+        await game.settings?.set(NGH_SYSTEM_ID, JOURNEY_POOL_SETTING, JSON.stringify(pool));
+        // Mark user as having played
+        const rawPlayed = String(game.settings?.get(NGH_SYSTEM_ID, JOURNEY_PLAYED_USERS_SETTING) ?? "[]");
+        let playedUsers = [];
+        try {
+            const parsedPlayed = JSON.parse(rawPlayed);
+            if (Array.isArray(parsedPlayed)) {
+                playedUsers = parsedPlayed.filter((c) => typeof c === "string" && c.length > 0);
+            }
+        }
+        catch {
+            playedUsers = [];
+        }
+        if (!playedUsers.includes(userId))
+            playedUsers.push(userId);
+        await game.settings?.set(NGH_SYSTEM_ID, JOURNEY_PLAYED_USERS_SETTING, JSON.stringify(playedUsers));
+        // Re-render the journey panel if open
+        if (panelInstance?.rendered)
+            void panelInstance.render();
+        // Notify all clients to re-render
+        broadcastJourneyUpdate("update");
+    }
+};
 let panelInstance = null;
 export const registerJourneyPanelSettings = () => {
     game.settings?.register(NGH_SYSTEM_ID, JOURNEY_PHASE_SETTING, {

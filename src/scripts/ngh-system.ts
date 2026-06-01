@@ -51,7 +51,7 @@ import {
   returnJourneyCardsToDeck,
   shuffleAndDealJourneyCards
 } from "./module/mechanics/shared-deck.js";
-import { NGHJourneyPanel, openJourneyPanel, registerJourneyPanelSettings, handleJourneySocketMessage } from "./apps/journey-panel.js";
+import { NGHJourneyPanel, openJourneyPanel, registerJourneyPanelSettings, handleJourneySocketMessage, handleJourneySocketMessageAsGM } from "./apps/journey-panel.js";
 import { openCombatPanel, registerCombatPanelSettings } from "./apps/combat-panel.js";
 import { openGMToolsPanel } from "./apps/gm-tools-panel.js";
 import { NGHActorSheet } from "./sheets/actor-sheet.js";
@@ -302,9 +302,11 @@ Hooks.once("init", () => {
 Hooks.once("ready", async () => {
   await initializeSharedDeck();
 
-  // Register socket listener for journey phase sync (non-GM clients re-render)
-  (game as any).socket?.on(`system.${NGH_SYSTEM_ID}`, (data: unknown) => {
-    if (!game.user?.isGM) {
+  // Register socket listener for journey phase sync
+  (game as any).socket?.on(`system.${NGH_SYSTEM_ID}`, async (data: unknown) => {
+    if (game.user?.isGM) {
+      await handleJourneySocketMessageAsGM(data);
+    } else {
       handleJourneySocketMessage(data);
     }
   });

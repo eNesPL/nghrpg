@@ -5,7 +5,7 @@ import { computeAttackPT, getNextRoundStarterOptions, getWeaponProfile, NGH_WEAP
 import { executeSkillTest, getSkillAttribute, rollChallenge } from "./module/mechanics/skill-tests.js";
 import { burnCardForPlusOne, burnCardForWhisper, burnCardsForHealing, burnForElementalRitual, drawForCorruptionRisk, getAdvancementCardCost, parseCard, spendCardsForAdvancement, useInitiativeCard, useJourneyCard } from "./module/mechanics/card-usage.js";
 import { discardFromHand, drawFromSharedDeck, drawJourneyHand, drawTopDeckCard, drawTopDeckCards, getJourneyHand, getMaxHandSize, getMaxJourneyHandSize, getSharedDeckState, getUserHand, hasCardInHand, initializeSharedDeck, isJoker, registerSharedDeckSettings, resetSharedDeck, reshuffleDiscardsIntoDrawPile, returnDiscardedJokersToDeck, returnCardsFromHandToDeck, returnJourneyCardsToDeck, shuffleAndDealJourneyCards } from "./module/mechanics/shared-deck.js";
-import { openJourneyPanel, registerJourneyPanelSettings, handleJourneySocketMessage } from "./apps/journey-panel.js";
+import { openJourneyPanel, registerJourneyPanelSettings, handleJourneySocketMessage, handleJourneySocketMessageAsGM } from "./apps/journey-panel.js";
 import { openCombatPanel, registerCombatPanelSettings } from "./apps/combat-panel.js";
 import { openGMToolsPanel } from "./apps/gm-tools-panel.js";
 import { NGHActorSheet } from "./sheets/actor-sheet.js";
@@ -185,9 +185,12 @@ Hooks.once("init", () => {
 });
 Hooks.once("ready", async () => {
     await initializeSharedDeck();
-    // Register socket listener for journey phase sync (non-GM clients re-render)
-    game.socket?.on(`system.${NGH_SYSTEM_ID}`, (data) => {
-        if (!game.user?.isGM) {
+    // Register socket listener for journey phase sync
+    game.socket?.on(`system.${NGH_SYSTEM_ID}`, async (data) => {
+        if (game.user?.isGM) {
+            await handleJourneySocketMessageAsGM(data);
+        }
+        else {
             handleJourneySocketMessage(data);
         }
     });

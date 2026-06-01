@@ -1,0 +1,11 @@
+Jurney, Player not have permission to put juurney
+obsluga page down/up strzałek/ scroll fix
+foundry.mjs:115122 User Player3 lacks permission to update Setting [UaeIPSjp3Jbk9lQM] 
+#fetch @ foundry.mjs:115122
+actor-sheet.js:112 nghrpg | Actor sheet action failed Error: User Player3 lacks permission to update Setting [UaeIPSjp3Jbk9lQM]
+    at /home/node/resources/app/dist/database/backend/server-backend.mjs:1:5632
+    at async Promise.all (index 0)
+    at async ServerDatabaseBackend._updateDocuments (/home/node/resources/app/dist/database/backend/server-backend.mjs:1:5384)
+    at async #try (/home/node/resources/app/common/utils/semaphore.mjs:98:17)
+(anonymous) @ actor-sheet.js:112
+foundry.mjs:115122 User Player3 lacks permission to update Setting [UaeIPSjp3Jbk9lQM] 

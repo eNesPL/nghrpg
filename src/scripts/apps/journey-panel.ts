@@ -174,6 +174,53 @@ export const handleJourneySocketMessage = (data: unknown): void => {
   }
 };
 
+/**
+ * GM-side socket handler. Players cannot write world-scoped settings, so they
+ * emit a "journeyContribute" socket message instead. The GM processes it here
+ * and updates the shared world settings, then broadcasts a re-render event.
+ */
+export const handleJourneySocketMessageAsGM = async (data: unknown): Promise<void> => {
+  if (!game.user?.isGM) return;
+  if (!data || typeof data !== "object") return;
+  const msg = data as Record<string, unknown>;
+
+  if (msg.type === "journeyContribute") {
+    const userId = typeof msg.userId === "string" ? msg.userId : null;
+    const cards = Array.isArray(msg.cards)
+      ? (msg.cards as unknown[]).filter((c): c is string => typeof c === "string")
+      : [];
+    if (!userId || cards.length === 0) return;
+
+    // Update the journey pool
+    const rawPool = String((game as any).settings?.get(NGH_SYSTEM_ID, JOURNEY_POOL_SETTING) ?? "[]");
+    let pool: string[] = [];
+    try {
+      const parsedPool = JSON.parse(rawPool);
+      if (Array.isArray(parsedPool)) pool = parsedPool.filter((c): c is string => typeof c === "string");
+    } catch { pool = []; }
+    pool.push(...cards);
+    await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_POOL_SETTING, JSON.stringify(pool));
+
+    // Mark user as having played
+    const rawPlayed = String((game as any).settings?.get(NGH_SYSTEM_ID, JOURNEY_PLAYED_USERS_SETTING) ?? "[]");
+    let playedUsers: string[] = [];
+    try {
+      const parsedPlayed = JSON.parse(rawPlayed);
+      if (Array.isArray(parsedPlayed)) {
+        playedUsers = parsedPlayed.filter((c): c is string => typeof c === "string" && c.length > 0);
+      }
+    } catch { playedUsers = []; }
+    if (!playedUsers.includes(userId)) playedUsers.push(userId);
+    await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_PLAYED_USERS_SETTING, JSON.stringify(playedUsers));
+
+    // Re-render the journey panel if open
+    if (panelInstance?.rendered) void panelInstance.render();
+
+    // Notify all clients to re-render
+    broadcastJourneyUpdate("update");
+  }
+};
+
 type JourneyPhase = "configure" | "collect" | "deal" | "reveal" | "resolve";
 
 type NGHJourneyApi = {

@@ -46,6 +46,7 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
   foundry.applications.sheets.ActorSheetV2
 ) {
   private _formSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private _scrollAbortController: AbortController | null = null;
 
   private t(key: string, fallback: string): string {
     const localized = game.i18n?.localize(key);
@@ -66,6 +67,7 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
   static override PARTS = {
     body: {
       template: "systems/nghrpg/templates/actor-sheet.html",
+      scrollable: ["form.ngh"],
       forms: {
         "form.ngh": {
           handler: NGHActorSheet._onSubmitForm as any,
@@ -91,6 +93,9 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
       clearTimeout(this._formSaveTimer);
       this._formSaveTimer = null;
     }
+
+    this._scrollAbortController?.abort();
+    this._scrollAbortController = null;
 
     if (this.isEditable) {
       try {
@@ -167,6 +172,32 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
     if (form) {
       form.addEventListener("input", () => this._scheduleFormPersist());
       form.addEventListener("change", () => this._scheduleFormPersist(0));
+    }
+
+    // Keyboard scroll support (PageUp/PageDown/arrows). Attach only once per open.
+    if (!this._scrollAbortController) {
+      this._scrollAbortController = new AbortController();
+      const { signal } = this._scrollAbortController;
+
+      root.addEventListener("keydown", (e: KeyboardEvent) => {
+        const focused = document.activeElement;
+        // Don't intercept when typing in an input, textarea, or select
+        if (focused && (focused.tagName === "INPUT" || focused.tagName === "TEXTAREA" || focused.tagName === "SELECT")) return;
+        // Only act when focus is inside this sheet
+        if (focused && !root.contains(focused)) return;
+        const scroller = root.querySelector("form.ngh") as HTMLElement | null;
+        if (!scroller) return;
+        const step = 72;
+        const page = scroller.clientHeight * 0.85;
+        switch (e.key) {
+          case "ArrowDown": scroller.scrollBy({ top: step, behavior: "smooth" }); e.preventDefault(); break;
+          case "ArrowUp":   scroller.scrollBy({ top: -step, behavior: "smooth" }); e.preventDefault(); break;
+          case "PageDown":  scroller.scrollBy({ top: page, behavior: "smooth" }); e.preventDefault(); break;
+          case "PageUp":    scroller.scrollBy({ top: -page, behavior: "smooth" }); e.preventDefault(); break;
+          case "Home":      scroller.scrollTo({ top: 0, behavior: "smooth" }); e.preventDefault(); break;
+          case "End":       scroller.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" }); e.preventDefault(); break;
+        }
+      }, { signal });
     }
 
     const run = (action: () => Promise<void>): void => {
@@ -1137,34 +1168,13 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
 
     const played = (result.playedCards ?? []).filter((value: unknown): value is string => typeof value === "string");
     if (played.length > 0) {
-      const rawPool = String((game as any).settings?.get(NGH_SYSTEM_ID, JOURNEY_POOL_SETTING) ?? "[]");
-      let pool: string[] = [];
-      try {
-        const parsed = JSON.parse(rawPool);
-        if (Array.isArray(parsed)) {
-          pool = parsed.filter((value): value is string => typeof value === "string");
-        }
-      } catch {
-        pool = [];
-      }
-      pool.push(...played);
-      await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_POOL_SETTING, JSON.stringify(pool));
-
-      const rawPlayed = String((game as any).settings?.get(NGH_SYSTEM_ID, JOURNEY_PLAYED_USERS_SETTING) ?? "[]");
-      let playedUsers: string[] = [];
-      try {
-        const parsedPlayed = JSON.parse(rawPlayed);
-        if (Array.isArray(parsedPlayed)) {
-          playedUsers = parsedPlayed.filter((value): value is string => typeof value === "string" && value.length > 0);
-        }
-      } catch {
-        playedUsers = [];
-      }
-
-      if (!playedUsers.includes(this.userId)) {
-        playedUsers.push(this.userId);
-        await (game as any).settings?.set(NGH_SYSTEM_ID, JOURNEY_PLAYED_USERS_SETTING, JSON.stringify(playedUsers));
-      }
+      // World-scoped settings can only be updated by GM.
+      // Ask GM to record the contribution via socket relay.
+      (game as any).socket?.emit(`system.${NGH_SYSTEM_ID}`, {
+        type: "journeyContribute",
+        userId: this.userId,
+        cards: played
+      });
     }
 
     await this.createChatMessage(this.t("NGH.Chat.Journey.Title", "Journey"), [

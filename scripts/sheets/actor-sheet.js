@@ -4,6 +4,7 @@ const JOURNEY_POOL_SETTING = "journeyPoolCards";
 const JOURNEY_PLAYED_USERS_SETTING = "journeyPlayedUsers";
 export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
     _formSaveTimer = null;
+    _scrollAbortController = null;
     t(key, fallback) {
         const localized = game.i18n?.localize(key);
         return localized && localized !== key ? localized : fallback;
@@ -20,6 +21,7 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
     static PARTS = {
         body: {
             template: "systems/nghrpg/templates/actor-sheet.html",
+            scrollable: ["form.ngh"],
             forms: {
                 "form.ngh": {
                     handler: NGHActorSheet._onSubmitForm,
@@ -38,6 +40,8 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
             clearTimeout(this._formSaveTimer);
             this._formSaveTimer = null;
         }
+        this._scrollAbortController?.abort();
+        this._scrollAbortController = null;
         if (this.isEditable) {
             try {
                 await this._persistOpenForm();
@@ -105,6 +109,51 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         if (form) {
             form.addEventListener("input", () => this._scheduleFormPersist());
             form.addEventListener("change", () => this._scheduleFormPersist(0));
+        }
+        // Keyboard scroll support (PageUp/PageDown/arrows). Attach only once per open.
+        if (!this._scrollAbortController) {
+            this._scrollAbortController = new AbortController();
+            const { signal } = this._scrollAbortController;
+            root.addEventListener("keydown", (e) => {
+                const focused = document.activeElement;
+                // Don't intercept when typing in an input, textarea, or select
+                if (focused && (focused.tagName === "INPUT" || focused.tagName === "TEXTAREA" || focused.tagName === "SELECT"))
+                    return;
+                // Only act when focus is inside this sheet
+                if (focused && !root.contains(focused))
+                    return;
+                const scroller = root.querySelector("form.ngh");
+                if (!scroller)
+                    return;
+                const step = 72;
+                const page = scroller.clientHeight * 0.85;
+                switch (e.key) {
+                    case "ArrowDown":
+                        scroller.scrollBy({ top: step, behavior: "smooth" });
+                        e.preventDefault();
+                        break;
+                    case "ArrowUp":
+                        scroller.scrollBy({ top: -step, behavior: "smooth" });
+                        e.preventDefault();
+                        break;
+                    case "PageDown":
+                        scroller.scrollBy({ top: page, behavior: "smooth" });
+                        e.preventDefault();
+                        break;
+                    case "PageUp":
+                        scroller.scrollBy({ top: -page, behavior: "smooth" });
+                        e.preventDefault();
+                        break;
+                    case "Home":
+                        scroller.scrollTo({ top: 0, behavior: "smooth" });
+                        e.preventDefault();
+                        break;
+                    case "End":
+                        scroller.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" });
+                        e.preventDefault();
+                        break;
+                }
+            }, { signal });
         }
         const run = (action) => {
             void action().catch((error) => {
@@ -885,34 +934,13 @@ export class NGHActorSheet extends foundry.applications.api.HandlebarsApplicatio
         const result = await this.api.mechanics.cards.useJourney(this.userId, card);
         const played = (result.playedCards ?? []).filter((value) => typeof value === "string");
         if (played.length > 0) {
-            const rawPool = String(game.settings?.get(NGH_SYSTEM_ID, JOURNEY_POOL_SETTING) ?? "[]");
-            let pool = [];
-            try {
-                const parsed = JSON.parse(rawPool);
-                if (Array.isArray(parsed)) {
-                    pool = parsed.filter((value) => typeof value === "string");
-                }
-            }
-            catch {
-                pool = [];
-            }
-            pool.push(...played);
-            await game.settings?.set(NGH_SYSTEM_ID, JOURNEY_POOL_SETTING, JSON.stringify(pool));
-            const rawPlayed = String(game.settings?.get(NGH_SYSTEM_ID, JOURNEY_PLAYED_USERS_SETTING) ?? "[]");
-            let playedUsers = [];
-            try {
-                const parsedPlayed = JSON.parse(rawPlayed);
-                if (Array.isArray(parsedPlayed)) {
-                    playedUsers = parsedPlayed.filter((value) => typeof value === "string" && value.length > 0);
-                }
-            }
-            catch {
-                playedUsers = [];
-            }
-            if (!playedUsers.includes(this.userId)) {
-                playedUsers.push(this.userId);
-                await game.settings?.set(NGH_SYSTEM_ID, JOURNEY_PLAYED_USERS_SETTING, JSON.stringify(playedUsers));
-            }
+            // World-scoped settings can only be updated by GM.
+            // Ask GM to record the contribution via socket relay.
+            game.socket?.emit(`system.${NGH_SYSTEM_ID}`, {
+                type: "journeyContribute",
+                userId: this.userId,
+                cards: played
+            });
         }
         await this.createChatMessage(this.t("NGH.Chat.Journey.Title", "Journey"), [
             result.source === "top-deck"
